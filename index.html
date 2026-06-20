@@ -27,7 +27,6 @@
     background:var(--bg);color:var(--white);font-family:var(--body);
     line-height:1.6;-webkit-font-smoothing:antialiased;
   }
-  /* smooth-scroll wrapper: we translate this element, body height is spacer */
   #scroll-content{position:fixed;top:0;left:0;width:100%;will-change:transform}
   ::selection{background:var(--blue);color:#fff}
   a{color:inherit;text-decoration:none}
@@ -118,7 +117,7 @@
   .panel{position:relative;z-index:2;background:var(--bg)}
 
   /* ---------- intro statement ---------- */
-  .statement{padding:110px 0 130px}
+  .statement{padding:60px 0 120px}
   .statement p{font-family:var(--display);font-weight:500;
     font-size:clamp(32px,5.4vw,76px);line-height:1.1;letter-spacing:-.02em;max-width:22ch}
   .statement .w{color:#2b3142;transition:color .5s}
@@ -150,7 +149,7 @@
   .mission-copy p+p{margin-top:22px}
 
   /* ---------- tech ---------- */
-  .tech{padding:120px 0}
+  .tech{padding:70px 0 120px}
   .tech-head{display:flex;justify-content:space-between;align-items:flex-end;
     margin-bottom:56px;flex-wrap:wrap;gap:20px}
   .tech-head h2{font-size:clamp(36px,5.5vw,76px);max-width:12ch}
@@ -169,7 +168,7 @@
   .trow .tmeta{font-family:var(--mono);font-size:12px;color:var(--grey);text-align:right}
 
   /* ---------- launch ---------- */
-  .launch{position:relative;height:170vh}
+  .launch{position:relative;height:135vh}
   .launch-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
   .launch-sticky .limg{position:absolute;inset:-8%;z-index:0}
   .launch-sticky .limg img{width:100%;height:116%;object-fit:cover;
@@ -193,7 +192,7 @@
   .launch-meta b{color:var(--white);font-weight:500}
 
   /* ---------- fleet ---------- */
-  .fleet{padding:120px 0;background:var(--bg-2)}
+  .fleet{padding:90px 0 120px;background:var(--bg-2)}
   .fleet-head{margin-bottom:70px}
   .fleet-head h2{font-size:clamp(36px,5.5vw,76px)}
   .rocket-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
@@ -298,7 +297,7 @@
 </header>
 
 <!-- HERO (pinned cinematic) -->
-<section id="top" style="height:150vh">
+<section id="top" style="height:130vh">
   <div class="hero-pin" id="heroPin">
     <div class="hero-bg" id="heroBg"><img src="pexels-pixabay-73872.jpg" alt="Start rakiety ORBITON"></div>
     <div class="hero-veil"></div>
@@ -369,7 +368,7 @@
 </section>
 
 <!-- MISSION (sticky image, copy scrolls) -->
-<section class="mission" id="mission" style="height:140vh">
+<section class="mission" id="mission" style="height:122vh">
   <div class="mission-sticky">
     <img id="missionImg" src="12019-space-89132_1920.jpg" alt="Astronauta na orbicie">
     <div class="wrap mission-copy">
@@ -582,8 +581,8 @@ function onScroll(y){
   const vh=window.innerHeight;
   header.classList.toggle('solid', y>40);
 
-  // HERO: pinned, progress across ~1.3 viewport
-  const hp=clamp(y/(vh*1.3),0,1);
+  // HERO: pinned, animation completes within ~0.85 viewport of scroll
+  const hp=clamp(y/(vh*0.85),0,1);
   heroBg.style.transform=`scale(${1+hp*0.22}) translateY(${hp*-6}%)`;
   heroContent.style.transform=`translateY(${hp*-90}px)`;
   heroContent.style.opacity=`${1-clamp((hp-0.45)/0.4,0,1)}`;
