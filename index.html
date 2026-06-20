@@ -7,330 +7,291 @@
 <meta name="description" content="ORBITON projektuje i buduje w pełni odzyskiwalne rakiety nowej generacji. Tańszy i szybszy dostęp do przestrzeni kosmicznej, made in Poland.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#05060A;
-    --bg-2:#0D0F17;
-    --blue:#3B82F6;
+    --bg:#04050A;
+    --bg-2:#0A0C14;
+    --blue:#4D7CFF;
     --amber:#FF7A1A;
     --white:#F5F7FA;
-    --grey:#8A93A6;
-    --line:#1C2030;
+    --grey:#7E889C;
+    --line:#191D2B;
     --display:'Space Grotesk',sans-serif;
     --body:'Inter',sans-serif;
     --mono:'JetBrains Mono',monospace;
-    --maxw:1240px;
+    --maxw:1280px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
   body{
-    background:var(--bg);
-    color:var(--white);
-    font-family:var(--body);
-    line-height:1.6;
-    overflow-x:hidden;
-    -webkit-font-smoothing:antialiased;
+    background:var(--bg);color:var(--white);font-family:var(--body);
+    line-height:1.6;-webkit-font-smoothing:antialiased;
   }
+  /* smooth-scroll wrapper: we translate this element, body height is spacer */
+  #scroll-content{position:fixed;top:0;left:0;width:100%;will-change:transform}
   ::selection{background:var(--blue);color:#fff}
   a{color:inherit;text-decoration:none}
   img{max-width:100%;display:block}
   section{position:relative}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.02;letter-spacing:-.025em}
 
-  /* ---------- utility ---------- */
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
-  .eyebrow{
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:.28em;
-    text-transform:uppercase;
-    color:var(--blue);
-    display:inline-flex;align-items:center;gap:10px;
-  }
-  .eyebrow::before{content:"";width:26px;height:1px;background:var(--blue);display:inline-block}
-  h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.05;letter-spacing:-.02em}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--blue)}
 
-  /* ---------- top nav ---------- */
-  header{
-    position:fixed;top:0;left:0;right:0;z-index:100;
-    backdrop-filter:blur(14px);
-    background:rgba(5,6,10,.55);
-    border-bottom:1px solid transparent;
-    transition:border-color .4s,background .4s;
-  }
-  header.scrolled{border-bottom:1px solid var(--line);background:rgba(5,6,10,.82)}
-  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
-  .brand{display:flex;align-items:center;gap:16px}
-  .logo{
-    font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.16em;
-    display:flex;align-items:center;gap:9px;
-  }
-  .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);
-    box-shadow:0 0 12px var(--amber);animation:pulse 2.4s infinite ease-in-out}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.7)}}
-  .clock{font-family:var(--mono);font-size:12px;color:var(--grey);letter-spacing:.08em;
-    padding-left:16px;border-left:1px solid var(--line)}
-  .clock b{color:var(--blue);font-weight:500}
-  .nav-links{display:flex;gap:34px;align-items:center}
-  .nav-links a{font-size:14px;color:var(--grey);transition:color .25s;position:relative}
-  .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:1px;
-    background:var(--blue);transition:width .3s}
-  .nav-links a:hover{color:var(--white)}
-  .nav-links a:hover::after{width:100%}
-  .nav-cta{
-    font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
-    padding:10px 18px;border:1px solid var(--line);border-radius:6px;color:var(--white)!important;
-    transition:all .3s;
-  }
-  .nav-cta:hover{border-color:var(--blue);box-shadow:0 0 22px rgba(59,130,246,.35);background:rgba(59,130,246,.08)}
-  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
-  .burger span{width:22px;height:2px;background:var(--white);transition:.3s}
-
-  /* ---------- HERO ---------- */
-  .hero{min-height:100vh;display:flex;align-items:center;overflow:hidden;
+  /* ---------- NAV ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:200;
+    transition:background .5s,backdrop-filter .5s,border-color .5s;
+    border-bottom:1px solid transparent}
+  header.solid{background:rgba(4,5,10,.7);backdrop-filter:blur(16px);
     border-bottom:1px solid var(--line)}
-  .hero-bg{position:absolute;inset:0;z-index:0}
-  .hero-bg img{width:100%;height:120%;object-fit:cover;object-position:center 40%;
-    opacity:.55;will-change:transform}
-  .hero-bg::after{content:"";position:absolute;inset:0;
-    background:
-      radial-gradient(120% 90% at 70% 30%, transparent 0%, rgba(5,6,10,.35) 45%, var(--bg) 90%),
-      linear-gradient(180deg, rgba(5,6,10,.65) 0%, rgba(5,6,10,.2) 35%, var(--bg) 100%)}
-  /* star canvas */
-  #stars{position:absolute;inset:0;z-index:1;opacity:.9}
-  /* grid overlay */
-  .hero-grid{position:absolute;inset:0;z-index:2;opacity:.4;
-    background-image:linear-gradient(var(--line) 1px,transparent 1px),
-      linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:64px 64px;
-    mask-image:radial-gradient(circle at 70% 35%,#000 0%,transparent 70%);
-    -webkit-mask-image:radial-gradient(circle at 70% 35%,#000 0%,transparent 70%)}
-  .hero-inner{position:relative;z-index:5;width:100%;padding-top:72px}
-  .hero h1{font-size:clamp(44px,8vw,104px);font-weight:700;margin:22px 0 0;
-    letter-spacing:-.03em}
-  .hero h1 .ln{display:block;overflow:hidden}
-  .hero h1 .ln span{display:block;transform:translateY(110%);
-    animation:rise .9s cubic-bezier(.22,1,.36,1) forwards}
-  .hero h1 .ln:nth-child(2) span{animation-delay:.12s}
-  @keyframes rise{to{transform:translateY(0)}}
-  .hero-sub{max-width:540px;color:var(--grey);font-size:clamp(15px,1.6vw,18px);
-    margin:28px 0 38px;opacity:0;animation:fadeUp .8s ease .5s forwards}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-  .hero-cta{display:flex;gap:16px;flex-wrap:wrap;opacity:0;
-    animation:fadeUp .8s ease .65s forwards}
-  .btn{font-family:var(--mono);font-size:13px;letter-spacing:.06em;
-    padding:15px 30px;border-radius:8px;cursor:pointer;border:1px solid transparent;
-    transition:all .3s;display:inline-flex;align-items:center;gap:10px}
-  .btn-primary{background:var(--blue);color:#fff;
-    box-shadow:0 0 0 rgba(59,130,246,.5)}
-  .btn-primary:hover{box-shadow:0 0 34px rgba(59,130,246,.6);transform:translateY(-2px)}
-  .btn-ghost{border-color:var(--line);color:var(--white)}
-  .btn-ghost:hover{border-color:var(--grey);background:rgba(255,255,255,.04);transform:translateY(-2px)}
-  .btn .arrow{transition:transform .3s}
-  .btn:hover .arrow{transform:translateX(4px)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:80px}
+  .logo{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.2em}
+  .logo b{color:var(--blue);font-weight:700}
+  .nav-links{display:flex;gap:40px;align-items:center}
+  .nav-links a{font-size:14px;color:var(--grey);transition:color .3s}
+  .nav-links a:hover{color:var(--white)}
+  .nav-cta{font-family:var(--mono);font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;padding:11px 20px;border:1px solid var(--line);
+    border-radius:2px;color:var(--white)!important;transition:all .3s}
+  .nav-cta:hover{border-color:var(--blue);background:var(--blue)}
+  .burger{display:none;flex-direction:column;gap:6px;cursor:pointer;padding:8px}
+  .burger span{width:24px;height:2px;background:var(--white)}
 
-  /* telemetry panel - SIGNATURE element */
-  .telemetry{position:absolute;right:28px;bottom:40px;z-index:6;
-    font-family:var(--mono);font-size:11px;color:var(--grey);
-    border:1px solid var(--line);border-radius:10px;
-    background:rgba(13,15,23,.6);backdrop-filter:blur(8px);
-    padding:16px 18px;min-width:230px;
-    opacity:0;animation:fadeUp .8s ease .9s forwards}
-  .telemetry .row{display:flex;justify-content:space-between;gap:24px;padding:3px 0}
-  .telemetry .row span:last-child{color:var(--white)}
-  .telemetry .hd{color:var(--blue);letter-spacing:.18em;font-size:10px;
-    border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px;
-    display:flex;justify-content:space-between;align-items:center}
-  .telemetry .live{color:var(--amber);display:flex;align-items:center;gap:6px}
-  .telemetry .live::before{content:"";width:6px;height:6px;border-radius:50%;
-    background:var(--amber);box-shadow:0 0 8px var(--amber);animation:pulse 1.6s infinite}
-  .scroll-hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:6;
-    font-family:var(--mono);font-size:10px;letter-spacing:.25em;color:var(--grey);
-    text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:10px;
-    opacity:0;animation:fadeUp 1s ease 1.2s forwards}
-  .scroll-hint .bar{width:1px;height:42px;background:linear-gradient(var(--grey),transparent);
-    position:relative;overflow:hidden}
-  .scroll-hint .bar::after{content:"";position:absolute;top:-42px;left:0;width:1px;height:42px;
-    background:linear-gradient(var(--blue),transparent);animation:scrolldot 2s infinite}
-  @keyframes scrolldot{to{top:42px}}
+  /* ---------- HERO (pinned cinematic) ---------- */
+  /* The hero is sticky and reacts to scroll progress driven by JS via --hp (0..1) */
+  .hero-pin{height:100vh;position:sticky;top:0;overflow:hidden;z-index:1}
+  .hero-bg{position:absolute;inset:-5%;z-index:0}
+  .hero-bg img{width:110%;height:110%;object-fit:cover;object-position:center 42%}
+  .hero-veil{position:absolute;inset:0;z-index:1;
+    background:radial-gradient(130% 100% at 64% 26%, transparent 0%, rgba(4,5,10,.45) 52%, var(--bg) 92%),
+      linear-gradient(180deg, rgba(4,5,10,.7) 0%, transparent 28%, rgba(4,5,10,.2) 60%, var(--bg) 100%)}
+  #stars{position:absolute;inset:0;z-index:2}
+  .hero-content{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;
+    justify-content:center;}
+  .hero-content .wrap{width:100%}
+  .hero-kicker{font-family:var(--mono);font-size:13px;letter-spacing:.34em;
+    color:var(--blue);text-transform:uppercase;margin-bottom:30px;overflow:hidden}
+  .hero-kicker span{display:inline-block}
+  .hero h1{font-size:clamp(52px,9.5vw,150px);font-weight:600;letter-spacing:-.04em;
+    line-height:.92}
+  .hero h1 .word{display:inline-block;overflow:hidden;vertical-align:top}
+  .hero h1 .word i{display:inline-block;font-style:normal}
+  .hero-sub{max-width:520px;color:#b6bdcc;font-size:clamp(16px,1.7vw,19px);
+    margin:38px 0 44px;font-weight:400}
+  .hero-cta{display:flex;gap:18px;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:13px;letter-spacing:.08em;
+    padding:17px 34px;border-radius:2px;cursor:pointer;border:1px solid transparent;
+    transition:transform .35s cubic-bezier(.22,1,.36,1),background .35s,border-color .35s,color .35s;
+    display:inline-flex;align-items:center;gap:12px;text-transform:uppercase}
+  .btn-primary{background:var(--white);color:#04050A}
+  .btn-primary:hover{transform:translateY(-3px);background:var(--blue);color:#fff}
+  .btn-ghost{border-color:#2a3043;color:var(--white)}
+  .btn-ghost:hover{transform:translateY(-3px);border-color:var(--white)}
+  .btn .ar{transition:transform .35s}
+  .btn:hover .ar{transform:translate(4px,-2px)}
 
-  /* ---------- reveal ---------- */
-  .reveal{opacity:0;transform:translateY(40px);
-    transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+  /* big rocket that flies up across hero as you scroll */
+  .hero-readout{position:absolute;left:32px;bottom:40px;z-index:6;
+    font-family:var(--mono);font-size:12px;color:var(--grey);
+    display:flex;gap:40px}
+  .hero-readout div b{display:block;color:var(--white);font-size:20px;font-weight:500;margin-top:6px}
+  .hero-progress{position:absolute;right:32px;bottom:46px;z-index:6;
+    font-family:var(--mono);font-size:12px;color:var(--grey);text-align:right}
+  .hero-progress .pct{color:var(--white);font-size:34px;font-weight:500;line-height:1}
+
+  /* ---------- generic reveal ---------- */
+  .reveal{opacity:0;transform:translateY(60px);
+    transition:opacity 1s cubic-bezier(.22,1,.36,1),transform 1s cubic-bezier(.22,1,.36,1)}
   .reveal.in{opacity:1;transform:none}
-  .reveal[data-d="1"]{transition-delay:.1s}
-  .reveal[data-d="2"]{transition-delay:.2s}
-  .reveal[data-d="3"]{transition-delay:.3s}
+  .reveal.d1{transition-delay:.12s}.reveal.d2{transition-delay:.24s}
+  .reveal.d3{transition-delay:.36s}.reveal.d4{transition-delay:.48s}
 
-  /* ---------- section heads ---------- */
-  .pad{padding:120px 0}
-  .sec-head{max-width:680px;margin-bottom:60px}
-  .sec-head h2{font-size:clamp(32px,5vw,56px);margin-top:18px}
-  .sec-head p{color:var(--grey);margin-top:20px;font-size:17px}
+  /* line-by-line text reveal */
+  .lines .line{display:block;overflow:hidden}
+  .lines .line i{display:block;font-style:normal;transform:translateY(105%);
+    transition:transform .9s cubic-bezier(.22,1,.36,1)}
+  .lines.in .line:nth-child(1) i{transition-delay:.05s}
+  .lines.in .line:nth-child(2) i{transition-delay:.15s}
+  .lines.in .line:nth-child(3) i{transition-delay:.25s}
+  .lines.in .line:nth-child(4) i{transition-delay:.35s}
+  .lines.in .line i{transform:translateY(0)}
+
+  .panel{position:relative;z-index:2;background:var(--bg)}
+
+  /* ---------- intro statement (big type, word highlight on scroll) ---------- */
+  .statement{padding:200px 0}
+  .statement p{font-family:var(--display);font-weight:500;
+    font-size:clamp(28px,4.6vw,64px);line-height:1.12;letter-spacing:-.02em;max-width:16ch}
+  .statement .w{color:#2b3142;transition:color .5s}
+  .statement .w.lit{color:var(--white)}
+  .statement .accent{color:var(--blue)}
 
   /* ---------- stats ---------- */
-  .stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-    background:var(--bg-2)}
-  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
-  .stat{padding:54px 32px;border-right:1px solid var(--line);position:relative}
-  .stat:last-child{border-right:none}
-  .stat .num{font-family:var(--display);font-weight:700;font-size:clamp(40px,5vw,62px);
-    color:var(--white);letter-spacing:-.02em;line-height:1}
-  .stat .num .u{color:var(--blue);font-size:.5em;margin-left:4px}
-  .stat .lbl{font-family:var(--mono);font-size:12px;color:var(--grey);margin-top:14px;
-    letter-spacing:.05em}
-  .stat::after{content:attr(data-id);position:absolute;top:20px;right:24px;
-    font-family:var(--mono);font-size:10px;color:var(--line)}
+  .stats{padding:80px 0 120px}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .stat{padding:0 36px;border-left:1px solid var(--line)}
+  .stat:first-child{padding-left:0;border-left:none}
+  .stat .num{font-family:var(--display);font-weight:500;
+    font-size:clamp(48px,6vw,82px);letter-spacing:-.03em;line-height:1}
+  .stat .num .s{color:var(--blue)}
+  .stat .lbl{font-family:var(--mono);font-size:12px;color:var(--grey);margin-top:16px;
+    line-height:1.5}
 
-  /* ---------- mission split ---------- */
-  .mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
-  .mission-img{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
-  .mission-img img{width:100%;height:520px;object-fit:cover;filter:contrast(1.05)}
-  .mission-img .tag{position:absolute;left:18px;bottom:18px;font-family:var(--mono);
-    font-size:11px;color:var(--white);background:rgba(5,6,10,.7);backdrop-filter:blur(6px);
-    padding:8px 14px;border-radius:6px;border:1px solid var(--line);letter-spacing:.08em}
-  .mission-img .corner{position:absolute;width:22px;height:22px;border-color:var(--blue)}
-  .mission-txt h2{font-size:clamp(30px,4vw,48px);margin:18px 0 24px}
-  .mission-txt p{color:var(--grey);font-size:17px}
-  .mission-txt p+p{margin-top:18px}
+  /* ---------- mission (sticky image + scrolling text) ---------- */
+  .mission{position:relative}
+  .mission-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;
+    overflow:hidden}
+  .mission-sticky img{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;opacity:.34;will-change:transform}
+  .mission-sticky::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(90deg,var(--bg) 8%,rgba(4,5,10,.55) 50%,rgba(4,5,10,.2) 100%)}
+  .mission-copy{position:relative;z-index:3}
+  .mission-copy h2{font-size:clamp(34px,5.4vw,72px);max-width:14ch;margin-bottom:34px}
+  .mission-copy p{color:#b6bdcc;font-size:clamp(16px,1.8vw,20px);max-width:46ch}
+  .mission-copy p+p{margin-top:22px}
 
-  /* ---------- tech cards ---------- */
-  .tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
-    border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .tcard{background:var(--bg);padding:38px 30px;transition:background .4s;position:relative;
-    min-height:240px;display:flex;flex-direction:column}
-  .tcard:hover{background:var(--bg-2)}
-  .tcard .ico{width:46px;height:46px;border-radius:10px;border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;margin-bottom:auto;
-    transition:all .4s}
-  .tcard:hover .ico{border-color:var(--blue);box-shadow:0 0 22px rgba(59,130,246,.3)}
-  .tcard .ico svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:1.5}
-  .tcard h3{font-size:20px;margin:24px 0 10px;font-weight:600}
-  .tcard p{color:var(--grey);font-size:14px}
-  .tcard .sys{font-family:var(--mono);font-size:10px;color:var(--line);
-    position:absolute;top:20px;right:22px;letter-spacing:.1em}
-  .tcard:hover .sys{color:var(--blue)}
+  /* ---------- tech (horizontal-feel cards, big index numbers) ---------- */
+  .tech{padding:160px 0}
+  .tech-head{display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:80px;flex-wrap:wrap;gap:20px}
+  .tech-head h2{font-size:clamp(36px,5.5vw,76px);max-width:12ch}
+  .tech-head p{color:var(--grey);max-width:34ch;font-size:16px}
+  .trow{display:grid;grid-template-columns:120px 1fr auto;gap:40px;align-items:center;
+    padding:42px 0;border-top:1px solid var(--line);position:relative;overflow:hidden}
+  .trow:last-child{border-bottom:1px solid var(--line)}
+  .trow .idx{font-family:var(--mono);font-size:15px;color:var(--blue)}
+  .trow .tmain h3{font-size:clamp(24px,3vw,40px);font-weight:500;
+    transition:transform .5s cubic-bezier(.22,1,.36,1)}
+  .trow .tmain p{color:var(--grey);font-size:15px;margin-top:8px;max-width:52ch;
+    opacity:0;max-height:0;transition:opacity .5s,max-height .5s,margin .5s}
+  .trow:hover{background:linear-gradient(90deg,rgba(77,124,255,.06),transparent)}
+  .trow:hover .tmain h3{transform:translateX(14px)}
+  .trow:hover .tmain p{opacity:1;max-height:60px;margin-top:12px}
+  .trow .tmeta{font-family:var(--mono);font-size:12px;color:var(--grey);text-align:right}
 
-  /* ---------- rockets ---------- */
-  .rockets{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .rocket-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-  .rcard{border:1px solid var(--line);border-radius:14px;padding:34px 30px;background:var(--bg);
-    transition:transform .4s,border-color .4s,box-shadow .4s;position:relative;overflow:hidden}
-  .rcard:hover{transform:translateY(-6px);border-color:rgba(59,130,246,.5);
-    box-shadow:0 24px 60px -20px rgba(59,130,246,.25)}
-  .rcard .status{font-family:var(--mono);font-size:10px;letter-spacing:.1em;
-    padding:5px 11px;border-radius:20px;display:inline-block;text-transform:uppercase}
-  .st-op{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
-  .st-test{background:rgba(255,122,26,.12);color:var(--amber);border:1px solid rgba(255,122,26,.3)}
-  .st-plan{background:rgba(138,147,166,.1);color:var(--grey);border:1px solid var(--line)}
-  .rcard h3{font-size:28px;margin:22px 0 6px}
-  .rcard .role{color:var(--grey);font-size:14px;margin-bottom:24px}
-  .specs{border-top:1px solid var(--line);padding-top:18px}
-  .specs .sp{display:flex;justify-content:space-between;font-family:var(--mono);
-    font-size:12px;padding:7px 0}
-  .specs .sp span:first-child{color:var(--grey)}
-  .specs .sp span:last-child{color:var(--white)}
-
-  /* ---------- next launch ---------- */
-  .launch{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
-  .launch-bg{position:absolute;inset:0;z-index:0}
-  .launch-bg img{width:100%;height:100%;object-fit:cover;opacity:.32;
-    object-position:center 30%;will-change:transform}
-  .launch-bg::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(90deg,var(--bg) 0%,rgba(5,6,10,.6) 55%,rgba(5,6,10,.3) 100%)}
-  .launch-inner{position:relative;z-index:3}
-  .countdown{display:flex;gap:18px;margin:34px 0;flex-wrap:wrap}
-  .cd{border:1px solid var(--line);border-radius:12px;padding:22px 26px;min-width:104px;
-    text-align:center;background:rgba(13,15,23,.6);backdrop-filter:blur(8px)}
-  .cd .v{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,52px);
-    color:var(--white);line-height:1;letter-spacing:-.02em}
-  .cd .l{font-family:var(--mono);font-size:11px;color:var(--grey);margin-top:10px;
-    letter-spacing:.12em;text-transform:uppercase}
-  .launch-meta{font-family:var(--mono);font-size:13px;color:var(--grey);
-    display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:30px}
+  /* ---------- launch (cinematic pinned, rocket rises) ---------- */
+  .launch{position:relative;height:240vh}
+  .launch-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+  .launch-sticky .limg{position:absolute;inset:-8%;z-index:0}
+  .launch-sticky .limg img{width:100%;height:116%;object-fit:cover;
+    object-position:center 60%;opacity:.5;will-change:transform}
+  .launch-sticky::after{content:"";position:absolute;inset:0;z-index:1;
+    background:radial-gradient(120% 90% at 50% 80%, transparent 0%, rgba(4,5,10,.4) 55%, var(--bg) 95%),
+      linear-gradient(180deg, var(--bg) 0%, transparent 30%, transparent 60%, var(--bg) 100%)}
+  .launch-ui{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center}
+  .launch-ui .eyebrow{margin-bottom:24px}
+  .launch-ui h2{font-size:clamp(40px,7vw,104px);letter-spacing:-.04em;line-height:.95}
+  .countdown{display:flex;gap:0;margin-top:48px;font-family:var(--mono)}
+  .cd{padding:0 30px;border-left:1px solid var(--line)}
+  .cd:first-child{border-left:none}
+  .cd .v{font-family:var(--display);font-weight:500;font-size:clamp(36px,5vw,64px);
+    line-height:1;letter-spacing:-.02em}
+  .cd .l{font-size:11px;color:var(--grey);letter-spacing:.16em;margin-top:12px;
+    text-transform:uppercase}
+  .launch-meta{position:absolute;left:32px;bottom:40px;z-index:4;font-family:var(--mono);
+    font-size:12px;color:var(--grey);text-align:left;line-height:2}
   .launch-meta b{color:var(--white);font-weight:500}
 
-  /* ---------- partners ---------- */
-  .partners{text-align:center}
-  .partner-row{display:flex;justify-content:center;flex-wrap:wrap;gap:18px 56px;
-    margin-top:40px}
-  .partner-row span{font-family:var(--display);font-weight:500;font-size:clamp(16px,2.2vw,22px);
-    color:var(--grey);opacity:.55;transition:opacity .3s,color .3s;cursor:default}
-  .partner-row span:hover{opacity:1;color:var(--white)}
+  /* ---------- fleet ---------- */
+  .fleet{padding:160px 0;background:var(--bg-2)}
+  .fleet-head{margin-bottom:70px}
+  .fleet-head h2{font-size:clamp(36px,5.5vw,76px)}
+  .rocket-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .rcard{border:1px solid var(--line);border-radius:3px;padding:40px 34px;
+    background:var(--bg);transition:transform .5s cubic-bezier(.22,1,.36,1),border-color .5s;
+    position:relative;overflow:hidden}
+  .rcard::before{content:"";position:absolute;left:0;top:0;height:2px;width:0;
+    background:var(--blue);transition:width .6s cubic-bezier(.22,1,.36,1)}
+  .rcard:hover{transform:translateY(-10px);border-color:#2a3043}
+  .rcard:hover::before{width:100%}
+  .rcard .st{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--grey)}
+  .rcard .st.op{color:var(--blue)}
+  .rcard .st.test{color:var(--amber)}
+  .rcard h3{font-size:34px;font-weight:500;margin:20px 0 4px}
+  .rcard .role{color:var(--grey);font-size:14px;margin-bottom:30px;min-height:42px}
+  .spec{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;
+    padding:11px 0;border-top:1px solid var(--line)}
+  .spec span:first-child{color:var(--grey)}
+
+  /* ---------- partners marquee ---------- */
+  .partners{padding:120px 0;overflow:hidden;border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line)}
+  .partners .lab{text-align:center;font-family:var(--mono);font-size:12px;
+    letter-spacing:.24em;color:var(--grey);text-transform:uppercase;margin-bottom:56px}
+  .marquee{display:flex;gap:80px;white-space:nowrap;width:max-content;
+    animation:scrollx 28s linear infinite}
+  .marquee span{font-family:var(--display);font-weight:500;
+    font-size:clamp(22px,3vw,40px);color:#39405a}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
 
   /* ---------- contact ---------- */
-  .contact{text-align:center;position:relative;overflow:hidden}
-  .contact-moon{position:absolute;right:-12%;top:50%;transform:translateY(-50%);
-    width:min(60vw,640px);z-index:0;opacity:.5;will-change:transform}
-  .contact-moon img{width:100%;
-    mask-image:radial-gradient(circle,#000 55%,transparent 72%);
-    -webkit-mask-image:radial-gradient(circle,#000 55%,transparent 72%)}
-  .contact-inner{position:relative;z-index:3;max-width:680px;margin:0 auto}
-  .contact h2{font-size:clamp(40px,7vw,84px);font-weight:700;letter-spacing:-.03em}
-  .contact p{color:var(--grey);font-size:18px;margin:24px 0 38px}
+  .contact{position:relative;height:120vh}
+  .contact-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;
+    justify-content:center;text-align:center;overflow:hidden}
+  .contact-moon{position:absolute;z-index:0;width:min(90vw,900px);left:50%;top:55%;
+    transform:translate(-50%,-50%);opacity:.5;will-change:transform}
+  .contact-moon img{width:100%;mask-image:radial-gradient(circle,#000 52%,transparent 70%);
+    -webkit-mask-image:radial-gradient(circle,#000 52%,transparent 70%)}
+  .contact-inner{position:relative;z-index:3;max-width:760px;padding:0 24px}
+  .contact h2{font-size:clamp(48px,10vw,128px);letter-spacing:-.045em;line-height:.92}
+  .contact p{color:#b6bdcc;font-size:19px;margin:30px 0 44px}
   .contact-info{font-family:var(--mono);font-size:13px;color:var(--grey);
-    margin-top:40px;display:flex;justify-content:center;gap:10px 30px;flex-wrap:wrap}
-  .contact-info a{color:var(--white);transition:color .3s}
+    margin-top:52px;display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
+  .contact-info a{color:var(--white)}
   .contact-info a:hover{color:var(--blue)}
 
   /* ---------- footer ---------- */
-  footer{border-top:1px solid var(--line);background:var(--bg-2);padding:48px 0 40px}
+  footer{background:var(--bg);padding:60px 0 50px;border-top:1px solid var(--line);
+    position:relative;z-index:2}
   .foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
-  .foot .logo{font-size:18px}
-  .foot-links{display:flex;gap:26px;font-size:14px}
-  .foot-links a{color:var(--grey);transition:color .3s}
-  .foot-links a:hover{color:var(--white)}
-  .foot-status{font-family:var(--mono);font-size:11px;color:var(--grey);
-    display:flex;align-items:center;gap:8px;margin-top:26px;justify-content:center;
-    width:100%;border-top:1px solid var(--line);padding-top:26px}
-  .foot-status .ok{color:var(--blue)}
-  .foot-status .d{width:6px;height:6px;border-radius:50%;background:var(--blue);
-    box-shadow:0 0 8px var(--blue);animation:pulse 2.4s infinite}
+  .foot-links{display:flex;gap:30px;font-size:14px}
+  .foot-links a{color:var(--grey)}.foot-links a:hover{color:var(--white)}
+  .foot-base{margin-top:40px;padding-top:30px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;color:var(--grey);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
-  /* ---------- responsive ---------- */
   @media(max-width:980px){
-    .stats-grid{grid-template-columns:repeat(2,1fr)}
-    .stat:nth-child(2){border-right:none}
-    .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}
-    .tech-grid{grid-template-columns:repeat(2,1fr)}
+    .stats-grid{grid-template-columns:1fr 1fr;gap:40px 0}
+    .stat{padding:0 24px}.stat:nth-child(odd){padding-left:0;border-left:none}
     .rocket-grid{grid-template-columns:1fr}
-    .mission-grid{grid-template-columns:1fr;gap:40px}
-    .mission-img img{height:380px}
+    .trow{grid-template-columns:60px 1fr;gap:20px}
+    .trow .tmeta{display:none}
+    .trow:hover .tmain p{max-height:80px}
   }
   @media(max-width:680px){
-    .nav-links{display:none}
-    .clock{display:none}
-    .burger{display:flex}
-    .pad{padding:80px 0}
-    .telemetry{display:none}
-    .stats-grid{grid-template-columns:1fr}
-    .stat{border-right:none;border-bottom:1px solid var(--line)}
-    .stat:last-child{border-bottom:none}
-    .tech-grid{grid-template-columns:1fr}
-    .hero h1{font-size:clamp(40px,13vw,64px)}
-    .contact-moon{opacity:.25}
+    .nav-links{display:none}.burger{display:flex}
+    .hero-readout{gap:24px;font-size:11px}
+    .hero-progress{display:none}
+    .countdown{flex-wrap:wrap;justify-content:center}
+    .cd{padding:12px 18px}
+    .contact-info{gap:18px}
   }
   @media(prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    #scroll-content{position:static!important;transform:none!important}
+    body{height:auto!important}
     .reveal{opacity:1;transform:none}
-    .hero h1 .ln span{transform:none}
-    .hero-sub,.hero-cta,.telemetry,.scroll-hint{opacity:1}
+    .lines .line i{transform:none}
+    .hero-pin,.mission-sticky,.launch-sticky,.contact-sticky{position:relative;height:auto}
+    .launch,.contact{height:auto}
+    .marquee{animation:none}
   }
 </style>
 </head>
 <body>
 
+<div id="scroll-content">
+
 <!-- NAV -->
 <header id="header">
   <div class="wrap nav">
-    <div class="brand">
-      <a class="logo" href="#top"><span class="dot"></span>ORBITON</a>
-      <span class="clock">MET <b id="met">T+00:00:00</b></span>
-    </div>
+    <a class="logo" href="#top">ORBI<b>TON</b></a>
     <nav class="nav-links">
       <a href="#mission">Misja</a>
       <a href="#tech">Technologia</a>
-      <a href="#rockets">Rakiety</a>
+      <a href="#fleet">Flota</a>
       <a href="#launch">Start</a>
       <a class="nav-cta" href="#contact">Kontakt</a>
     </nav>
@@ -338,171 +299,213 @@
   </div>
 </header>
 
-<!-- HERO -->
-<section class="hero" id="top">
-  <div class="hero-bg"><img id="heroImg" src="pexels-pixabay-73872.jpg" alt="Start rakiety ORBITON"></div>
-  <canvas id="stars"></canvas>
-  <div class="hero-grid"></div>
-  <div class="hero-inner">
-    <div class="wrap">
-      <span class="eyebrow">PL · NEXT-GEN LAUNCH SYSTEMS</span>
-      <h1>
-        <span class="ln"><span>Polska droga</span></span>
-        <span class="ln"><span>na orbitę</span></span>
-      </h1>
-      <p class="hero-sub">Projektujemy i budujemy rakiety nowej generacji. Tańszy, szybszy i w pełni odzyskiwalny dostęp do przestrzeni kosmicznej, made in Poland.</p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#mission">Poznaj naszą misję <span class="arrow">→</span></a>
-        <a class="btn btn-ghost" href="#launch">Zobacz starty na żywo</a>
+<!-- HERO (pinned cinematic) -->
+<section id="top" style="height:200vh">
+  <div class="hero-pin" id="heroPin">
+    <div class="hero-bg" id="heroBg"><img src="pexels-pixabay-73872.jpg" alt="Start rakiety ORBITON"></div>
+    <div class="hero-veil"></div>
+    <canvas id="stars"></canvas>
+    <div class="hero-content" id="heroContent">
+      <div class="wrap">
+        <div class="hero-kicker"><span>PL // NEXT-GEN LAUNCH SYSTEMS</span></div>
+        <h1 id="heroTitle">
+          <span class="word"><i>Polska</i></span>
+          <span class="word"><i>droga</i></span><br>
+          <span class="word"><i>na</i></span>
+          <span class="word"><i>orbitę</i></span>
+        </h1>
+        <p class="hero-sub">Projektujemy i budujemy w pełni odzyskiwalne rakiety nowej generacji. Tańszy i szybszy dostęp do przestrzeni kosmicznej, made in Poland.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#mission">Poznaj misję <span class="ar">↗</span></a>
+          <a class="btn btn-ghost" href="#launch">Następny start</a>
+        </div>
       </div>
     </div>
+    <div class="hero-readout">
+      <div>ALTITUDE<b id="ro-alt">000 km</b></div>
+      <div>VELOCITY<b id="ro-vel">0.00 km/s</b></div>
+      <div>STATUS<b id="ro-st">PRELAUNCH</b></div>
+    </div>
+    <div class="hero-progress">
+      <div>ASCENT</div>
+      <div class="pct" id="ro-pct">00%</div>
+    </div>
   </div>
-  <div class="telemetry">
-    <div class="hd"><span>TELEMETRIA</span><span class="live">LIVE</span></div>
-    <div class="row"><span>ALT</span><span id="t-alt">412.6 km</span></div>
-    <div class="row"><span>VEL</span><span id="t-vel">7.66 km/s</span></div>
-    <div class="row"><span>STAGE</span><span>ORBIT · NOMINAL</span></div>
-    <div class="row"><span>LAT/LON</span><span>54.59 / 16.85</span></div>
+</section>
+
+<div class="panel">
+
+<!-- STATEMENT -->
+<section class="statement">
+  <div class="wrap">
+    <p id="stmt">
+      <span class="w">Wierzymy,</span> <span class="w">że</span> <span class="w">przyszłość</span>
+      <span class="w">ludzkości</span> <span class="w">rozgrywa</span> <span class="w">się</span>
+      <span class="w accent">wśród</span> <span class="w accent">gwiazd.</span>
+      <span class="w">I</span> <span class="w">że</span> <span class="w">droga</span> <span class="w">tam</span>
+      <span class="w">prowadzi</span> <span class="w">przez</span> <span class="w">Polskę.</span>
+    </p>
   </div>
-  <div class="scroll-hint"><span>SCROLL</span><span class="bar"></span></div>
 </section>
 
 <!-- STATS -->
 <section class="stats">
-  <div class="stats-grid">
-    <div class="stat reveal" data-id="STAT_01"><div class="num" data-target="47">0</div><div class="lbl">udanych startów</div></div>
-    <div class="stat reveal" data-d="1" data-id="STAT_02"><div class="num" data-target="100" data-suffix="%">0</div><div class="lbl">odzyskanych rakiet w 2025</div></div>
-    <div class="stat reveal" data-d="2" data-id="STAT_03"><div class="num" data-target="12"><span></span></div><div class="lbl">maks. ładunek na LEO (t)</div></div>
-    <div class="stat reveal" data-d="3" data-id="STAT_04"><div class="num" data-target="9">0</div><div class="lbl">minut do wejścia na orbitę</div></div>
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat reveal">
+        <div class="num"><span data-target="47">0</span></div>
+        <div class="lbl">UDANYCH<br>STARTÓW</div>
+      </div>
+      <div class="stat reveal d1">
+        <div class="num"><span data-target="100">0</span><span class="s">%</span></div>
+        <div class="lbl">ODZYSKANYCH<br>RAKIET W 2025</div>
+      </div>
+      <div class="stat reveal d2">
+        <div class="num"><span data-target="12">0</span><span class="s">t</span></div>
+        <div class="lbl">MAKS. ŁADUNEK<br>NA ORBITĘ LEO</div>
+      </div>
+      <div class="stat reveal d3">
+        <div class="num"><span data-target="9">0</span><span class="s">min</span></div>
+        <div class="lbl">DO WEJŚCIA<br>NA ORBITĘ</div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- MISSION -->
-<section class="pad" id="mission">
-  <div class="wrap">
-    <div class="mission-grid">
-      <div class="mission-txt reveal">
-        <span class="eyebrow">Nasza misja</span>
-        <h2>Otwieramy kosmos dla każdego</h2>
-        <p>Wierzymy, że przyszłość ludzkości rozgrywa się wśród gwiazd. Budujemy w pełni odzyskiwalne rakiety, które obniżają koszt wynoszenia ładunku nawet dziesięciokrotnie.</p>
-        <p>Satelity, badania naukowe i marzenia o eksploracji mają stać się dostępne nie dla nielicznych, lecz dla wszystkich. Z Polski. Dla świata.</p>
+<!-- MISSION (sticky image, copy scrolls) -->
+<section class="mission" id="mission" style="height:180vh">
+  <div class="mission-sticky">
+    <img id="missionImg" src="12019-space-89132_1920.jpg" alt="Astronauta na orbicie">
+    <div class="wrap mission-copy">
+      <div class="reveal lines" data-lines>
+        <span class="eyebrow" style="display:block;margin-bottom:28px">// Nasza misja</span>
+        <h2 class="lines" data-lines><span class="line"><i>Otwieramy</i></span><span class="line"><i>kosmos dla</i></span><span class="line"><i>każdego</i></span></h2>
       </div>
-      <div class="mission-img reveal" data-d="1">
-        <img src="12019-space-89132_1920.jpg" alt="Astronauta na orbicie">
-        <span class="tag">EVA · ORBITON-9 · ORBITA LEO</span>
-      </div>
+      <p class="reveal d2">Budujemy w pełni odzyskiwalne rakiety, które obniżają koszt wynoszenia ładunku nawet dziesięciokrotnie. Satelity, badania i marzenia o eksploracji przestają być domeną nielicznych.</p>
+      <p class="reveal d3">Z Polski. Dla świata.</p>
     </div>
   </div>
 </section>
 
 <!-- TECH -->
-<section class="pad" id="tech" style="padding-top:0">
+<section class="tech" id="tech">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow">Technologia</span>
-      <h2>Inżynieria, która wraca z kosmosu</h2>
-      <p>Każdy system projektujemy z myślą o wielokrotnym użyciu, autonomii i pełnej kontroli nad produkcją.</p>
+    <div class="tech-head">
+      <h2 class="reveal lines" data-lines><span class="line"><i>Inżynieria, która</i></span><span class="line"><i>wraca z kosmosu</i></span></h2>
+      <p class="reveal d1">Każdy system projektujemy z myślą o wielokrotnym użyciu, autonomii i pełnej kontroli nad produkcją.</p>
     </div>
-    <div class="tech-grid">
-      <div class="tcard reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2L9 9H3l5 5-2 8 6-4 6 4-2-8 5-5h-6z"/></svg></div><span class="sys">SYS_01</span><h3>Silniki wielokrotnego użytku</h3><p>Autorskie silniki na ciekły metan, projektowane na setki lotów.</p></div>
-      <div class="tcard reveal" data-d="1"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v14m0 0l-5-5m5 5l5-5M4 22h16"/></svg></div><span class="sys">SYS_02</span><h3>Lądowanie pionowe</h3><p>Pierwszy stopień wraca i ląduje z precyzją co do metra.</p></div>
-      <div class="tcard reveal" data-d="2"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.5-5.5l-2.8 2.8M9.3 14.7l-2.8 2.8m11 0l-2.8-2.8M9.3 9.3L6.5 6.5"/></svg></div><span class="sys">SYS_03</span><h3>Awionika nowej generacji</h3><p>W pełni autonomiczne sterowanie i nawigacja w czasie rzeczywistym.</p></div>
-      <div class="tcard reveal" data-d="3"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13M3 21h18M9 21v-6h6v6"/></svg></div><span class="sys">SYS_04</span><h3>Produkcja w Polsce</h3><p>Własna fabryka i kontrola całego łańcucha dostaw.</p></div>
+    <div class="trows">
+      <div class="trow reveal">
+        <div class="idx">01</div>
+        <div class="tmain"><h3>Silniki wielokrotnego użytku</h3><p>Autorskie silniki na ciekły metan, projektowane na setki lotów bez wymiany podzespołów.</p></div>
+        <div class="tmeta">METALOX<br>SEA-LEVEL</div>
+      </div>
+      <div class="trow reveal">
+        <div class="idx">02</div>
+        <div class="tmain"><h3>Lądowanie pionowe</h3><p>Pierwszy stopień wraca i ląduje z precyzją liczoną w metrach, gotowy do ponownego lotu.</p></div>
+        <div class="tmeta">PROPULSIVE<br>LANDING</div>
+      </div>
+      <div class="trow reveal">
+        <div class="idx">03</div>
+        <div class="tmain"><h3>Awionika nowej generacji</h3><p>W pełni autonomiczne sterowanie i nawigacja w czasie rzeczywistym, potrójnie redundantne.</p></div>
+        <div class="tmeta">TRIPLE<br>REDUNDANT</div>
+      </div>
+      <div class="trow reveal">
+        <div class="idx">04</div>
+        <div class="tmain"><h3>Produkcja w Polsce</h3><p>Własna fabryka i kontrola całego łańcucha dostaw, od kompozytów po oprogramowanie.</p></div>
+        <div class="tmeta">MADE IN<br>POLAND</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ROCKETS -->
-<section class="pad rockets" id="rockets">
+</div><!-- /panel -->
+
+<!-- LAUNCH (cinematic pinned, rocket rises) -->
+<section class="launch" id="launch">
+  <div class="launch-sticky">
+    <div class="limg" id="launchImg"><img src="pexels-spacex-586061.jpg" alt="Rakieta na stanowisku startowym"></div>
+    <div class="launch-ui">
+      <span class="eyebrow">// Następny start</span>
+      <h2>ORBITON-9 · DEMO-2</h2>
+      <div class="countdown">
+        <div class="cd"><div class="v" id="cd-d">14</div><div class="l">dni</div></div>
+        <div class="cd"><div class="v" id="cd-h">22</div><div class="l">godz</div></div>
+        <div class="cd"><div class="v" id="cd-m">06</div><div class="l">min</div></div>
+        <div class="cd"><div class="v" id="cd-s">09</div><div class="l">sek</div></div>
+      </div>
+    </div>
+    <div class="launch-meta">
+      STANOWISKO <b>Kosmodrom Ustka</b><br>
+      ŁADUNEK <b>satelita obserwacyjny</b><br>
+      OKNO STARTU <b>06:42 CEST</b>
+    </div>
+  </div>
+</section>
+
+<div class="panel">
+
+<!-- FLEET -->
+<section class="fleet" id="fleet">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow">Nasza flota</span>
-      <h2>Rakiety ORBITON</h2>
-      <p>Od lekkich nosicieli po ciężkie systemy wielokrotnego użytku.</p>
+    <div class="fleet-head">
+      <span class="eyebrow reveal" style="display:block;margin-bottom:20px">// Nasza flota</span>
+      <h2 class="reveal d1 lines" data-lines><span class="line"><i>Rakiety ORBITON</i></span></h2>
     </div>
     <div class="rocket-grid">
       <div class="rcard reveal">
-        <span class="status st-op">Operacyjny</span>
+        <div class="st op">Operacyjny</div>
         <h3>ORBITON-1</h3>
-        <div class="role">Lekki nosiciel</div>
-        <div class="specs">
-          <div class="sp"><span>Wysokość</span><span>32 m</span></div>
-          <div class="sp"><span>Ładunek na LEO</span><span>3,5 t</span></div>
-          <div class="sp"><span>Loty</span><span>38</span></div>
-        </div>
+        <div class="role">Lekki nosiciel orbitalny</div>
+        <div class="spec"><span>Wysokość</span><span>32 m</span></div>
+        <div class="spec"><span>Ładunek / LEO</span><span>3,5 t</span></div>
+        <div class="spec"><span>Wykonane loty</span><span>38</span></div>
       </div>
-      <div class="rcard reveal" data-d="1">
-        <span class="status st-test">Testy</span>
+      <div class="rcard reveal d1">
+        <div class="st test">W testach</div>
         <h3>ORBITON-9</h3>
         <div class="role">Ciężki nosiciel wielokrotnego użytku</div>
-        <div class="specs">
-          <div class="sp"><span>Wysokość</span><span>68 m</span></div>
-          <div class="sp"><span>Ładunek na LEO</span><span>12 t</span></div>
-          <div class="sp"><span>Odzysk</span><span>1. stopień</span></div>
-        </div>
+        <div class="spec"><span>Wysokość</span><span>68 m</span></div>
+        <div class="spec"><span>Ładunek / LEO</span><span>12 t</span></div>
+        <div class="spec"><span>Odzysk</span><span>1. stopień</span></div>
       </div>
-      <div class="rcard reveal" data-d="2">
-        <span class="status st-plan">W projekcie</span>
+      <div class="rcard reveal d2">
+        <div class="st">W projekcie</div>
         <h3>ORBITAL-PL</h3>
-        <div class="role">Przyszłościowy system orbitalny</div>
-        <div class="specs">
-          <div class="sp"><span>Załoga</span><span>do 6 osób</span></div>
-          <div class="sp"><span>Cel</span><span>LEO / Księżyc</span></div>
-          <div class="sp"><span>Premiera</span><span>2029</span></div>
-        </div>
+        <div class="role">Załogowy system orbitalny</div>
+        <div class="spec"><span>Załoga</span><span>do 6 osób</span></div>
+        <div class="spec"><span>Cel</span><span>LEO / Księżyc</span></div>
+        <div class="spec"><span>Premiera</span><span>2029</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- NEXT LAUNCH -->
-<section class="pad launch" id="launch">
-  <div class="launch-bg"><img id="launchImg" src="pexels-spacex-586061.jpg" alt="Rakieta na stanowisku startowym"></div>
-  <div class="wrap launch-inner">
-    <div class="reveal">
-      <span class="eyebrow">Następny start</span>
-      <h2 style="font-size:clamp(30px,5vw,52px);margin-top:18px">MISJA ORBITON-9 · DEMO-2</h2>
-    </div>
-    <div class="countdown reveal" data-d="1">
-      <div class="cd"><div class="v" id="cd-d">14</div><div class="l">dni</div></div>
-      <div class="cd"><div class="v" id="cd-h">22</div><div class="l">godzin</div></div>
-      <div class="cd"><div class="v" id="cd-m">06</div><div class="l">minut</div></div>
-      <div class="cd"><div class="v" id="cd-s">09</div><div class="l">sekund</div></div>
-    </div>
-    <div class="launch-meta reveal" data-d="2">
-      <span>STANOWISKO <b>Kosmodrom Ustka, Polska</b></span>
-      <span>ŁADUNEK <b>satelita obserwacyjny</b></span>
-      <span>OKNO <b>06:42 CEST</b></span>
-    </div>
-    <a class="btn btn-primary reveal" data-d="2" href="#contact">Ustaw przypomnienie <span class="arrow">→</span></a>
+<!-- PARTNERS marquee -->
+<section class="partners">
+  <div class="lab">Współpracujemy z</div>
+  <div class="marquee">
+    <span>Europejska Agencja Kosmiczna</span><span>Politechnika Warszawska</span>
+    <span>Ministerstwo Rozwoju</span><span>CERN</span>
+    <span>Europejska Agencja Kosmiczna</span><span>Politechnika Warszawska</span>
+    <span>Ministerstwo Rozwoju</span><span>CERN</span>
   </div>
 </section>
 
-<!-- PARTNERS -->
-<section class="pad partners">
-  <div class="wrap">
-    <span class="eyebrow reveal" style="display:inline-flex">Współpracujemy z</span>
-    <div class="partner-row reveal" data-d="1">
-      <span>Europejska Agencja Kosmiczna</span>
-      <span>Politechnika Warszawska</span>
-      <span>Ministerstwo Rozwoju</span>
-      <span>CERN</span>
-    </div>
-  </div>
-</section>
+</div><!-- /panel -->
 
-<!-- CONTACT -->
-<section class="pad contact" id="contact">
-  <div class="contact-moon"><img id="moonImg" src="thespaceway-mercury-6618698_1920.jpg" alt=""></div>
-  <div class="wrap contact-inner">
-    <div class="reveal">
-      <span class="eyebrow" style="display:inline-flex">Dołącz do misji</span>
-      <h2 style="margin-top:22px">Gotowi na start?</h2>
+<!-- CONTACT (sticky moon) -->
+<section class="contact" id="contact">
+  <div class="contact-sticky">
+    <div class="contact-moon" id="contactMoon"><img src="thespaceway-mercury-6618698_1920.jpg" alt=""></div>
+    <div class="contact-inner">
+      <span class="eyebrow">// Dołącz do misji</span>
+      <h2 class="lines" data-lines style="margin-top:24px"><span class="line"><i>Gotowi</i></span><span class="line"><i>na start?</i></span></h2>
       <p>Współpraca, inwestycje, media. Porozmawiajmy o przyszłości.</p>
-      <a class="btn btn-primary" href="mailto:kontakt@orbiton.space">Skontaktuj się z nami <span class="arrow">→</span></a>
+      <a class="btn btn-primary" href="mailto:kontakt@orbiton.space">Skontaktuj się <span class="ar">↗</span></a>
       <div class="contact-info">
-        <span>E-MAIL <a href="mailto:kontakt@orbiton.space">kontakt@orbiton.space</a></span>
-        <span>BAZA <a href="#">Kosmodrom Ustka, Polska</a></span>
+        <span>kontakt@orbiton.space</span>
+        <span>Kosmodrom Ustka, Polska</span>
       </div>
     </div>
   </div>
@@ -512,111 +515,178 @@
 <footer>
   <div class="wrap">
     <div class="foot">
-      <a class="logo" href="#top"><span class="dot"></span>ORBITON</a>
+      <a class="logo" href="#top">ORBI<b>TON</b></a>
       <div class="foot-links">
         <a href="#">LinkedIn</a><a href="#">X</a><a href="#">YouTube</a>
       </div>
     </div>
-    <div class="foot-status"><span class="d"></span>SYSTEM STATUS: <span class="ok">ALL NOMINAL</span> · © 2026 ORBITON · Ad astra per aspera</div>
+    <div class="foot-base">
+      <span>© 2026 ORBITON · Ad astra per aspera</span>
+      <span>SYSTEM STATUS: ALL NOMINAL</span>
+    </div>
   </div>
 </footer>
 
+</div><!-- /scroll-content -->
+
 <script>
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-/* ---- nav scroll state ---- */
-const header = document.getElementById('header');
-addEventListener('scroll',()=>{header.classList.toggle('scrolled',scrollY>40)},{passive:true});
+/* ============ SMOOTH SCROLL ============ */
+const content=document.getElementById('scroll-content');
+let target=0,current=0;
+function setBodyHeight(){document.body.style.height=content.offsetHeight+'px';}
+addEventListener('load',setBodyHeight);addEventListener('resize',setBodyHeight);setBodyHeight();
 
-/* ---- burger (smooth scroll to contact for simplicity) ---- */
-document.getElementById('burger').addEventListener('click',()=>{
-  document.getElementById('contact').scrollIntoView({behavior:'smooth'});
-});
+function raf(){
+  target=window.scrollY||window.pageYOffset;
+  current=lerp(current,target,reduce?1:0.085);
+  if(Math.abs(target-current)<0.05)current=target;
+  content.style.transform=`translateY(${-current}px)`;
+  onScroll(current);
+  requestAnimationFrame(raf);
+}
+if(!reduce){requestAnimationFrame(raf);}
+else{content.style.position='static';document.body.style.height='auto';}
 
-/* ---- starfield ---- */
-const cv=document.getElementById('stars'),cx=cv.getContext('2d');
-let stars=[],W,H;
-function resize(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;
-  stars=Array.from({length:Math.min(140,Math.round(W*H/12000))},()=>({
-    x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.2,
-    a:Math.random(),s:Math.random()*.02+.004}));}
-resize();addEventListener('resize',resize);
-function draw(){cx.clearRect(0,0,W,H);
-  for(const st of stars){st.a+=st.s;const tw=.5+Math.sin(st.a)*.5;
-    cx.globalAlpha=tw*.9;cx.fillStyle='#cdd6e6';
-    cx.beginPath();cx.arc(st.x,st.y,st.r,0,7);cx.fill();}
-  cx.globalAlpha=1;requestAnimationFrame(draw);}
-if(!reduce)draw();
+/* helper: progress of element through viewport (0 enters bottom, 1 leaves top) */
+function prog(el){
+  const r=el.getBoundingClientRect();
+  return clamp((window.innerHeight - r.top)/(window.innerHeight + r.height),0,1);
+}
 
-/* ---- parallax ---- */
-const heroImg=document.getElementById('heroImg');
+/* ============ PER-FRAME SCROLL EFFECTS ============ */
+const header=document.getElementById('header');
+const heroBg=document.getElementById('heroBg');
+const heroContent=document.getElementById('heroContent');
+const heroTitleWords=[...document.querySelectorAll('#heroTitle .word i')];
+const roAlt=document.getElementById('ro-alt'),roVel=document.getElementById('ro-vel'),
+      roSt=document.getElementById('ro-st'),roPct=document.getElementById('ro-pct');
+const missionImg=document.getElementById('missionImg');
 const launchImg=document.getElementById('launchImg');
-const moonImg=document.getElementById('moonImg');
-const launchSec=document.getElementById('launch');
-const contactSec=document.getElementById('contact');
-if(!reduce){
-  addEventListener('scroll',()=>{
-    const y=scrollY;
-    heroImg.style.transform=`translateY(${y*.28}px) scale(1.05)`;
-    const lr=launchSec.getBoundingClientRect();
-    launchImg.style.transform=`translateY(${(innerHeight-lr.top)*-.06}px)`;
-    const cr=contactSec.getBoundingClientRect();
-    moonImg.style.transform=`translateY(-50%) translateX(${(innerHeight-cr.top)*-.04}px) rotate(${(innerHeight-cr.top)*.01}deg)`;
-  },{passive:true});
+const launchUI=document.querySelector('.launch-ui');
+const contactMoon=document.getElementById('contactMoon');
+const stmt=document.getElementById('stmt');
+const stmtWords=[...stmt.querySelectorAll('.w')];
+
+// hero title intro (run once on load)
+function heroIntro(){
+  heroTitleWords.forEach((w,i)=>{
+    w.style.transition='transform 1s cubic-bezier(.22,1,.36,1)';
+    w.style.transform='translateY(110%)';
+    requestAnimationFrame(()=>{
+      setTimeout(()=>{w.style.transform='translateY(0)';},120+i*90);
+    });
+  });
+}
+heroIntro();
+
+function onScroll(y){
+  const vh=window.innerHeight;
+  header.classList.toggle('solid', y>40);
+
+  // HERO: pinned, progress across first viewport
+  const hp=clamp(y/(vh),0,1);
+  heroBg.style.transform=`scale(${1+hp*0.22}) translateY(${hp*-6}%)`;
+  heroContent.style.transform=`translateY(${hp*-90}px)`;
+  heroContent.style.opacity=`${1-clamp((hp-0.45)/0.4,0,1)}`;
+  const alt=Math.round(hp*412);
+  const vel=(hp*7.66).toFixed(2);
+  roAlt.textContent=String(alt).padStart(3,'0')+' km';
+  roVel.textContent=vel+' km/s';
+  roPct.textContent=String(Math.round(hp*100)).padStart(2,'0')+'%';
+  roSt.textContent= hp<0.05?'PRELAUNCH': hp<0.85?'ASCENT':'ORBIT';
+
+  // STATEMENT: light up words progressively
+  const sp=prog(stmt);
+  const lit=Math.floor(clamp((sp-0.15)/0.55,0,1)*stmtWords.length);
+  stmtWords.forEach((w,i)=>w.classList.toggle('lit',i<lit));
+
+  // MISSION: ken-burns image
+  if(missionImg){
+    const mp=prog(document.getElementById('mission'));
+    missionImg.style.transform=`scale(${1.1+mp*0.12}) translateY(${(mp-.5)*8}%)`;
+  }
+
+  // LAUNCH: rocket rises, UI scales
+  if(launchImg){
+    const lp=prog(document.getElementById('launch'));
+    launchImg.querySelector('img').style.transform=`translateY(${lp*-18}%) scale(${1.05+lp*0.12})`;
+    launchUI.style.transform=`translateY(${(lp-.5)*-60}px)`;
+    launchUI.style.opacity=`${1-clamp(Math.abs(lp-0.5)-0.32,0,1)/0.18}`;
+  }
+
+  // CONTACT: moon drifts & rotates
+  if(contactMoon){
+    const cp=prog(document.getElementById('contact'));
+    contactMoon.style.transform=`translate(-50%,${-50 + (cp-.5)*-26}%) scale(${0.9+cp*0.25}) rotate(${cp*8}deg)`;
+  }
 }
 
-/* ---- reveal on scroll ---- */
+/* ============ REVEAL + LINES + COUNTUP ============ */
 const io=new IntersectionObserver((es)=>{
-  es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');
-    if(e.target.querySelector('[data-target]'))countUp(e.target);io.unobserve(e.target);}});
-},{threshold:.25});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      const c=e.target.querySelector('[data-target]');
+      if(c)countUp(e.target);
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.3,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal,[data-lines]').forEach(el=>io.observe(el));
 
-/* ---- count up ---- */
 function countUp(scope){
-  const el=scope.querySelector('[data-target]');if(!el||el.dataset.done)return;
-  el.dataset.done=1;
-  const target=+el.dataset.target,suf=el.dataset.suffix||'';
-  const dur=1400,t0=performance.now();
-  function step(t){let p=Math.min((t-t0)/dur,1);p=1-Math.pow(1-p,3);
-    el.textContent=Math.round(target*p)+suf;
-    if(p<1)requestAnimationFrame(step);}
-  requestAnimationFrame(step);
+  scope.querySelectorAll('[data-target]').forEach(el=>{
+    if(el.dataset.done)return;el.dataset.done=1;
+    const t=+el.dataset.target,dur=1600,t0=performance.now();
+    (function step(now){let p=clamp((now-t0)/dur,0,1);p=1-Math.pow(1-p,3);
+      el.textContent=Math.round(t*p);
+      if(p<1)requestAnimationFrame(step);})(t0);
+  });
 }
 
-/* ---- MET clock (mission elapsed time, counts up from page load) ---- */
-const metEl=document.getElementById('met'),t0=Date.now();
-setInterval(()=>{
-  let s=Math.floor((Date.now()-t0)/1000);
-  const h=String(Math.floor(s/3600)).padStart(2,'0');
-  const m=String(Math.floor(s%3600/60)).padStart(2,'0');
-  const ss=String(s%60).padStart(2,'0');
-  metEl.textContent=`T+${h}:${m}:${ss}`;
-},1000);
+/* ============ STARFIELD ============ */
+const cv=document.getElementById('stars'),cx=cv.getContext('2d');
+let stars=[],SW,SH;
+function sizeStars(){SW=cv.width=cv.offsetWidth;SH=cv.height=cv.offsetHeight;
+  stars=Array.from({length:Math.min(120,Math.round(SW*SH/16000))},()=>({
+    x:Math.random()*SW,y:Math.random()*SH,r:Math.random()*1.3+.2,
+    o:Math.random()*.6+.2}));}
+sizeStars();addEventListener('resize',sizeStars);
+function drawStars(){cx.clearRect(0,0,SW,SH);
+  for(const s of stars){cx.globalAlpha=s.o;cx.fillStyle='#dfe6f5';
+    cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill();}
+  cx.globalAlpha=1;requestAnimationFrame(drawStars);}
+if(!reduce)drawStars();
 
-/* ---- launch countdown ---- */
-const target=new Date(Date.now()+ (14*864e5+22*36e5+6*6e4+9e3));
-const dEl=document.getElementById('cd-d'),hEl=document.getElementById('cd-h'),
-mEl=document.getElementById('cd-m'),sEl=document.getElementById('cd-s');
-function tick(){
-  let diff=Math.max(0,target-Date.now());
-  const d=Math.floor(diff/864e5);diff-=d*864e5;
-  const h=Math.floor(diff/36e5);diff-=h*36e5;
-  const m=Math.floor(diff/6e4);diff-=m*6e4;
-  const s=Math.floor(diff/1e3);
-  dEl.textContent=String(d).padStart(2,'0');
-  hEl.textContent=String(h).padStart(2,'0');
-  mEl.textContent=String(m).padStart(2,'0');
-  sEl.textContent=String(s).padStart(2,'0');
-}
+/* ============ COUNTDOWN ============ */
+const T=new Date(Date.now()+(14*864e5+22*36e5+6*6e4+9e3));
+const dE=document.getElementById('cd-d'),hE=document.getElementById('cd-h'),
+mE=document.getElementById('cd-m'),sE=document.getElementById('cd-s');
+function tick(){let d=Math.max(0,T-Date.now());
+  const D=Math.floor(d/864e5);d-=D*864e5;const H=Math.floor(d/36e5);d-=H*36e5;
+  const M=Math.floor(d/6e4);d-=M*6e4;const S=Math.floor(d/1e3);
+  dE.textContent=String(D).padStart(2,'0');hE.textContent=String(H).padStart(2,'0');
+  mE.textContent=String(M).padStart(2,'0');sE.textContent=String(S).padStart(2,'0');}
 tick();setInterval(tick,1000);
 
-/* ---- live telemetry flicker ---- */
-const altEl=document.getElementById('t-alt'),velEl=document.getElementById('t-vel');
-if(!reduce)setInterval(()=>{
-  altEl.textContent=(410+Math.random()*5).toFixed(1)+' km';
-  velEl.textContent=(7.64+Math.random()*.05).toFixed(2)+' km/s';
-},2000);
+/* ============ NAV anchor jump ============ */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href');if(id==='#')return;
+    const el=document.querySelector(id);if(!el)return;
+    e.preventDefault();
+    const top=el.getBoundingClientRect().top + (window.scrollY||0);
+    window.scrollTo({top,behavior: reduce?'auto':'smooth'});
+  });
+});
+document.getElementById('burger').addEventListener('click',()=>{
+  const top=document.getElementById('contact').getBoundingClientRect().top+(window.scrollY||0);
+  window.scrollTo({top,behavior:'smooth'});
+});
 </script>
 </body>
 </html>
