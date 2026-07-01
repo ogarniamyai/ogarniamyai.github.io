@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GŁĘBIA — zejście scrollem na dno oceanu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --surface:#8FE3DC; --mid:#12475C; --deep:#06121F; --abyss:#020509;
+  --biolum:#7CF0C4; --text:#EAF6F4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--abyss);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+#scene{position:fixed;inset:0;z-index:0}
+.hud{position:fixed;top:24px;right:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
+  text-align:right;font-size:13px;line-height:1.7;color:var(--biolum);
+  background:rgba(2,5,9,.35);padding:14px 18px;border:1px solid rgba(124,240,196,.25);
+  backdrop-filter:blur(4px)}
+.hud .depth{font-size:28px;font-weight:600;letter-spacing:.02em}
+.hud .unit{font-size:14px;opacity:.7}
+.content{position:relative;z-index:5}
+section{min-height:100vh;display:flex;align-items:center;padding:0 8vw}
+section .box{max-width:560px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;
+  color:var(--biolum);margin-bottom:16px}
+h1,h2{font-family:'Syne',sans-serif;font-weight:800;line-height:1.05}
+h1{font-size:clamp(48px,9vw,110px);letter-spacing:-.02em}
+h2{font-size:clamp(32px,5vw,56px);margin-bottom:20px}
+p{font-size:17px;line-height:1.7;color:rgba(234,246,244,.82);max-width:46ch}
+.scrollhint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;
+  color:rgba(234,246,244,.6);transition:opacity .5s}
+.scrollhint.hidden{opacity:0}
+@media (prefers-reduced-motion: reduce){ .float{animation:none!important} }
+footer{position:relative;z-index:5;padding:12vh 8vw 16vh;font-family:'IBM Plex Mono',monospace;
+  font-size:12px;color:rgba(234,246,244,.5);line-height:2}
+footer a{color:var(--biolum);text-decoration:none}
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div class="hud" aria-hidden="true">
+  <div class="depth"><span id="m">0</span><span class="unit"> m</span></div>
+  <div><span id="atm">1</span> atm &nbsp;·&nbsp; <span id="temp">22</span>°C</div>
+  <div id="zone">POWIERZCHNIA</div>
+</div>
+<div class="scrollhint" id="hint">SCROLLUJ, ŻEBY ZANURKOWAĆ ▼</div>
+
+<div class="content">
+<section>
+  <div class="box">
+    <div class="eyebrow">EKSPEDYCJA · 10 900 M W DÓŁ</div>
+    <h1>GŁĘBIA</h1>
+    <p>Każdy piksel scrolla to metry w dół. Zejdź z rozświetlonej powierzchni
+    aż na dno Rowu Mariańskiego — i patrz, jak ocean gasi światło.</p>
+  </div>
+</section>
+
+<section>
+  <div class="box">
+    <div class="eyebrow">0–200 M · STREFA EUFOTYCZNA</div>
+    <h2>Tu jeszcze sięga słońce</h2>
+    <p>Pierwsze dwieście metrów to jedyna warstwa oceanu, w której możliwa jest
+    fotosynteza. Poniżej tej granicy światło słoneczne praktycznie znika —
+    a razem z nim kolory.</p>
+  </div>
+</section>
+
+<section>
+  <div class="box">
+    <div class="eyebrow">200–1000 M · STREFA ZMIERZCHU</div>
+    <h2>Śnieg, który nigdy nie topnieje</h2>
+    <p>Wokół ciebie opada „śnieg morski" — cząstki materii organicznej dryfujące
+    z góry. Dla mieszkańców głębin to główne źródło pożywienia. Podróż jednej
+    drobinki na dno może trwać tygodniami.</p>
+  </div>
+</section>
+
+<section>
+  <div class="box">
+    <div class="eyebrow">1000–4000 M · STREFA PÓŁNOCY</div>
+    <h2>Światło robią już tylko żywi</h2>
+    <p>Od tysiąca metrów w dół panuje całkowita ciemność. Jedyne rozbłyski
+    to bioluminescencja — zimne, zielonkawe światło produkowane przez same
+    organizmy. Większość mieszkańców tej strefy potrafi świecić.</p>
+  </div>
+</section>
+
+<section>
+  <div class="box">
+    <div class="eyebrow">4000–6000 M · OTCHŁAŃ</div>
+    <h2>Równiny abisalne</h2>
+    <p>Płaskie, ciemne, lodowate. Równiny abisalne pokrywają większość dna
+    oceanów — to najrozleglejsze środowisko na Ziemi, a znamy je gorzej
+    niż powierzchnię Księżyca.</p>
+  </div>
+</section>
+
+<section>
+  <div class="box">
+    <div class="eyebrow">~10 900 M · GŁĘBIA CHALLENGERA</div>
+    <h2>Dno.</h2>
+    <p>Najgłębszy znany punkt oceanu. Ciśnienie ponad tysiąc razy większe niż
+    na powierzchni — jakby na każdym centymetrze twojej skóry stał słoń.
+    Więcej ludzi było na Księżycu niż tutaj.</p>
+  </div>
+</section>
+</div>
+
+<footer>
+  STRONA W CAŁOŚCI NAPISANA PRZEZ CLAUDE (ANTHROPIC) · JEDEN PLIK HTML · THREE.JS<br>
+  <a href="https://ogarniamy.ai">ogarniamy.ai</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, .1, 400);
+camera.position.set(0, 4, 26);
+
+// ---- kolory stref (powierzchnia -> otchłań)
+const stops = [
+  {t:0.00, c:new THREE.Color('#8FE3DC')},
+  {t:0.18, c:new THREE.Color('#2E7D8C')},
+  {t:0.40, c:new THREE.Color('#12475C')},
+  {t:0.65, c:new THREE.Color('#06121F')},
+  {t:1.00, c:new THREE.Color('#020509')}
+];
+function lerpStops(t){
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i], b=stops[i+1];
+    if(t>=a.t && t<=b.t){
+      return a.c.clone().lerp(b.c,(t-a.t)/(b.t-a.t));
+    }
+  }
+  return stops[stops.length-1].c.clone();
+}
+scene.fog = new THREE.Fog(0x8FE3DC, 8, 70);
+
+const amb = new THREE.AmbientLight(0xffffff, 1.0);
+const sun = new THREE.DirectionalLight(0xCFF6F0, 1.2);
+sun.position.set(3,10,4);
+scene.add(amb, sun);
+
+// ---- śnieg morski (particles)
+const SNOW = 3500, span = 300;
+const pos = new Float32Array(SNOW*3);
+for(let i=0;i<SNOW;i++){
+  pos[i*3]   = (Math.random()-.5)*70;
+  pos[i*3+1] = 20 - Math.random()*span;
+  pos[i*3+2] = (Math.random()-.5)*70;
+}
+const snowGeo = new THREE.BufferGeometry();
+snowGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+const snow = new THREE.Points(snowGeo, new THREE.PointsMaterial({
+  color:0xDDEBE9, size:.14, transparent:true, opacity:.75, depthWrite:false
+}));
+scene.add(snow);
+
+// ---- bioluminescencja (świeci głęboko)
+const GLOW = 500;
+const gpos = new Float32Array(GLOW*3);
+for(let i=0;i<GLOW;i++){
+  gpos[i*3]   = (Math.random()-.5)*60;
+  gpos[i*3+1] = -70 - Math.random()*200;
+  gpos[i*3+2] = (Math.random()-.5)*60;
+}
+const glowGeo = new THREE.BufferGeometry();
+glowGeo.setAttribute('position', new THREE.BufferAttribute(gpos,3));
+const glowMat = new THREE.PointsMaterial({
+  color:0x7CF0C4, size:.5, transparent:true, opacity:0,
+  blending:THREE.AdditiveBlending, depthWrite:false
+});
+scene.add(new THREE.Points(glowGeo, glowMat));
+
+// ---- stworzenia (wireframe) na różnych głębokościach
+const wire = c => new THREE.MeshBasicMaterial({color:c, wireframe:true, transparent:true, opacity:.5});
+const creatures = [];
+function addCreature(geo, mat, x,y,z, spin){
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x,y,z); m.userData.spin = spin;
+  scene.add(m); creatures.push(m); return m;
+}
+addCreature(new THREE.IcosahedronGeometry(2.4,1), wire(0x9FDCD6), -7,-38,-6, .003);   // meduza / zmierzch
+addCreature(new THREE.IcosahedronGeometry(1.4,0), wire(0x9FDCD6),  8,-55, -10,-.004);
+addCreature(new THREE.TorusKnotGeometry(2.2,.5,90,10), wire(0x7CF0C4), 6,-110,-8, .002); // strefa północy
+addCreature(new THREE.IcosahedronGeometry(3.2,1), wire(0x7CF0C4), -9,-150,-14,-.0015);
+addCreature(new THREE.ConeGeometry(2.5,9,7,3,true), wire(0x4FB89A), 7,-205,-10, .001);   // otchłań
+
+// ---- dno
+const floorGeo = new THREE.PlaneGeometry(160,160,60,60);
+const fp = floorGeo.attributes.position;
+for(let i=0;i<fp.count;i++){ fp.setZ(i, Math.random()*1.6); }
+floorGeo.computeVertexNormals();
+const seafloor = new THREE.Mesh(floorGeo, new THREE.MeshStandardMaterial({color:0x0B1A24, roughness:1}));
+seafloor.rotation.x = -Math.PI/2;
+seafloor.position.y = -262;
+scene.add(seafloor);
+const floorLight = new THREE.PointLight(0x7CF0C4, 0, 40);
+floorLight.position.set(0,-254,0);
+scene.add(floorLight);
+
+// ---- scroll -> stan
+const MAXD = 10900;
+let target = 0, current = 0;
+const mEl=document.getElementById('m'), atmEl=document.getElementById('atm'),
+      tEl=document.getElementById('temp'), zEl=document.getElementById('zone'),
+      hint=document.getElementById('hint');
+const zones=[[0,'POWIERZCHNIA'],[200,'STREFA ZMIERZCHU'],[1000,'STREFA PÓŁNOCY'],[4000,'OTCHŁAŃ'],[6000,'STREFA HADALNA']];
+function frac(){
+  const h = document.documentElement;
+  return Math.min(1, h.scrollTop / (h.scrollHeight - h.clientHeight));
+}
+addEventListener('scroll', ()=>{ target = frac(); hint.classList.toggle('hidden', target>0.02); }, {passive:true});
+
+function resize(){
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+let t0 = 0;
+function tick(time){
+  requestAnimationFrame(tick);
+  const dt = Math.min(50, time - t0); t0 = time;
+  current += (target - current) * (reduced ? 1 : .06);
+
+  // kamera w dół
+  camera.position.y = 4 - current * 260;
+  camera.position.x = Math.sin(current*Math.PI*2)*1.2;
+  camera.rotation.z = Math.sin(current*Math.PI*4)*0.015;
+
+  // światło i mgła
+  const col = lerpStops(current);
+  scene.fog.color.copy(col);
+  renderer.setClearColor(col);
+  amb.intensity = Math.max(.12, 1.0 - current*1.4);
+  sun.intensity = Math.max(0, 1.2 - current*3);
+  glowMat.opacity = Math.min(.95, Math.max(0,(current-.28)*2.2));
+  floorLight.intensity = Math.max(0,(current-.85))*14;
+
+  // ruchy
+  if(!reduced){
+    for(const c of creatures){ c.rotation.y += c.userData.spin*dt; c.rotation.x += c.userData.spin*.6*dt; }
+    const p = snowGeo.attributes.position;
+    for(let i=0;i<SNOW;i++){
+      let y = p.getY(i) - .0016*dt;
+      if(y < 20-span) y = 20;
+      p.setY(i,y);
+    }
+    p.needsUpdate = true;
+  }
+
+  // HUD
+  const d = Math.round(current*MAXD);
+  mEl.textContent = d.toLocaleString('pl-PL');
+  atmEl.textContent = Math.round(1 + d/10).toLocaleString('pl-PL');
+  tEl.textContent = Math.max(1, Math.round(22 - Math.min(d,1000)/1000*18 - Math.min(Math.max(d-1000,0),9900)/9900*3));
+  let zn = zones[0][1];
+  for(const [dep,name] of zones){ if(d>=dep) zn = name; }
+  zEl.textContent = zn;
+
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
