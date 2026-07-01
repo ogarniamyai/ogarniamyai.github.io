@@ -3,273 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GŁĘBIA — zejście scrollem na dno oceanu</title>
+<title>GŁĘBIA — cinematic scroll-driven descent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --surface:#8FE3DC; --mid:#12475C; --deep:#06121F; --abyss:#020509;
-  --biolum:#7CF0C4; --text:#EAF6F4;
-}
+:root{--biolum:#7CF0C4;--text:#EAF6F4}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:auto}
-body{background:var(--abyss);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+body{background:#020509;color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+#spacer{height:1400vh}
 #scene{position:fixed;inset:0;z-index:0}
+/* film layers */
+#vignette{position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)}
+#grain{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.06;mix-blend-mode:overlay}
+#grain canvas{width:100%;height:100%}
+.bar{position:fixed;left:0;width:100%;height:0;background:#000;z-index:6;transition:none}
+#barT{top:0}#barB{bottom:0}
+/* HUD */
 .hud{position:fixed;top:24px;right:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
-  text-align:right;font-size:13px;line-height:1.7;color:var(--biolum);
-  background:rgba(2,5,9,.35);padding:14px 18px;border:1px solid rgba(124,240,196,.25);
-  backdrop-filter:blur(4px)}
-.hud .depth{font-size:28px;font-weight:600;letter-spacing:.02em}
-.hud .unit{font-size:14px;opacity:.7}
-.content{position:relative;z-index:5}
-section{min-height:100vh;display:flex;align-items:center;padding:0 8vw}
-section .box{max-width:560px}
-.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;
-  color:var(--biolum);margin-bottom:16px}
-h1,h2{font-family:'Syne',sans-serif;font-weight:800;line-height:1.05}
-h1{font-size:clamp(48px,9vw,110px);letter-spacing:-.02em}
-h2{font-size:clamp(32px,5vw,56px);margin-bottom:20px}
-p{font-size:17px;line-height:1.7;color:rgba(234,246,244,.82);max-width:46ch}
-.scrollhint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10;
-  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;
-  color:rgba(234,246,244,.6);transition:opacity .5s}
-.scrollhint.hidden{opacity:0}
-@media (prefers-reduced-motion: reduce){ .float{animation:none!important} }
-footer{position:relative;z-index:5;padding:12vh 8vw 16vh;font-family:'IBM Plex Mono',monospace;
-  font-size:12px;color:rgba(234,246,244,.5);line-height:2}
-footer a{color:var(--biolum);text-decoration:none}
+  text-align:right;font-size:12px;line-height:1.7;color:var(--biolum);
+  background:rgba(2,5,9,.3);padding:12px 16px;border:1px solid rgba(124,240,196,.2);backdrop-filter:blur(4px)}
+.hud .depth{font-size:26px;font-weight:600}
+.hud .unit{font-size:13px;opacity:.7}
+/* cinematic captions — all fixed, scroll only drives them */
+.cap{position:fixed;z-index:8;left:8vw;top:50%;transform:translateY(-40%);
+  max-width:600px;opacity:0;pointer-events:none;will-change:opacity,transform}
+.cap.center{left:50%;text-align:center;transform:translate(-50%,-40%)}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;color:var(--biolum);margin-bottom:14px}
+h1,h2{font-family:'Syne',sans-serif;font-weight:800;line-height:1.04;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+h1{font-size:clamp(52px,10vw,130px);letter-spacing:-.02em}
+h2{font-size:clamp(30px,5vw,58px);margin-bottom:16px}
+p{font-size:16px;line-height:1.7;color:rgba(234,246,244,.85);max-width:44ch;text-shadow:0 1px 16px rgba(0,0,0,.7)}
+.cap.center p{margin:0 auto}
+.scrollhint{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:10;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(234,246,244,.6)}
+.credit{position:fixed;bottom:20px;left:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:.15em;color:rgba(234,246,244,.4)}
+.credit a{color:var(--biolum);text-decoration:none}
 </style>
 </head>
 <body>
+<div id="spacer"></div>
 <canvas id="scene"></canvas>
+<div id="vignette"></div>
+<div id="grain"><canvas id="gc" width="140" height="140"></canvas></div>
+<div class="bar" id="barT"></div><div class="bar" id="barB"></div>
 
 <div class="hud" aria-hidden="true">
   <div class="depth"><span id="m">0</span><span class="unit"> m</span></div>
-  <div><span id="atm">1</span> atm &nbsp;·&nbsp; <span id="temp">22</span>°C</div>
+  <div><span id="atm">1</span> atm · <span id="temp">22</span>°C</div>
   <div id="zone">POWIERZCHNIA</div>
 </div>
-<div class="scrollhint" id="hint">SCROLLUJ, ŻEBY ZANURKOWAĆ ▼</div>
+<div class="scrollhint" id="hint">SCROLL = ZANURZENIE ▼</div>
+<div class="credit">NAPISANE PRZEZ CLAUDE · <a href="https://ogarniamy.ai">ogarniamy.ai</a></div>
 
-<div class="content">
-<section>
-  <div class="box">
-    <div class="eyebrow">EKSPEDYCJA · 10 900 M W DÓŁ</div>
-    <h1>GŁĘBIA</h1>
-    <p>Każdy piksel scrolla to metry w dół. Zejdź z rozświetlonej powierzchni
-    aż na dno Rowu Mariańskiego — i patrz, jak ocean gasi światło.</p>
-  </div>
-</section>
-
-<section>
-  <div class="box">
-    <div class="eyebrow">0–200 M · STREFA EUFOTYCZNA</div>
-    <h2>Tu jeszcze sięga słońce</h2>
-    <p>Pierwsze dwieście metrów to jedyna warstwa oceanu, w której możliwa jest
-    fotosynteza. Poniżej tej granicy światło słoneczne praktycznie znika —
-    a razem z nim kolory.</p>
-  </div>
-</section>
-
-<section>
-  <div class="box">
-    <div class="eyebrow">200–1000 M · STREFA ZMIERZCHU</div>
-    <h2>Śnieg, który nigdy nie topnieje</h2>
-    <p>Wokół ciebie opada „śnieg morski" — cząstki materii organicznej dryfujące
-    z góry. Dla mieszkańców głębin to główne źródło pożywienia. Podróż jednej
-    drobinki na dno może trwać tygodniami.</p>
-  </div>
-</section>
-
-<section>
-  <div class="box">
-    <div class="eyebrow">1000–4000 M · STREFA PÓŁNOCY</div>
-    <h2>Światło robią już tylko żywi</h2>
-    <p>Od tysiąca metrów w dół panuje całkowita ciemność. Jedyne rozbłyski
-    to bioluminescencja — zimne, zielonkawe światło produkowane przez same
-    organizmy. Większość mieszkańców tej strefy potrafi świecić.</p>
-  </div>
-</section>
-
-<section>
-  <div class="box">
-    <div class="eyebrow">4000–6000 M · OTCHŁAŃ</div>
-    <h2>Równiny abisalne</h2>
-    <p>Płaskie, ciemne, lodowate. Równiny abisalne pokrywają większość dna
-    oceanów — to najrozleglejsze środowisko na Ziemi, a znamy je gorzej
-    niż powierzchnię Księżyca.</p>
-  </div>
-</section>
-
-<section>
-  <div class="box">
-    <div class="eyebrow">~10 900 M · GŁĘBIA CHALLENGERA</div>
-    <h2>Dno.</h2>
-    <p>Najgłębszy znany punkt oceanu. Ciśnienie ponad tysiąc razy większe niż
-    na powierzchni — jakby na każdym centymetrze twojej skóry stał słoń.
-    Więcej ludzi było na Księżycu niż tutaj.</p>
-  </div>
-</section>
+<div class="cap center" data-in="0" data-out=".08">
+  <div class="eyebrow">EKSPEDYCJA · 10 900 M W DÓŁ</div>
+  <h1>GŁĘBIA</h1>
 </div>
-
-<footer>
-  STRONA W CAŁOŚCI NAPISANA PRZEZ CLAUDE (ANTHROPIC) · JEDEN PLIK HTML · THREE.JS<br>
-  <a href="https://ogarniamy.ai">ogarniamy.ai</a>
-</footer>
+<div class="cap" data-in=".10" data-out=".20">
+  <div class="eyebrow">0–200 M · STREFA EUFOTYCZNA</div>
+  <h2>Tu jeszcze sięga słońce</h2>
+  <p>Snopy światła nad tobą to ostatnie, co zobaczysz ze słońca. Poniżej dwustu metrów fotosynteza ustaje — razem z kolorami.</p>
+</div>
+<div class="cap" data-in=".24" data-out=".36">
+  <div class="eyebrow">200–1000 M · STREFA ZMIERZCHU</div>
+  <h2>Puls meduz</h2>
+  <p>Wokół opada śnieg morski — pokarm całych głębin dryfujący tygodniami na dno. Między drobinami pulsują meduzy.</p>
+</div>
+<div class="cap center" data-in=".42" data-out=".52">
+  <h2>Od tego miejsca światło nie istnieje.</h2>
+</div>
+<div class="cap" data-in=".56" data-out=".68">
+  <div class="eyebrow">1000–4000 M · STREFA PÓŁNOCY</div>
+  <h2>Coś dużego</h2>
+  <p>Kaszaloty nurkują tu na połowy głębiej niż kilometr, wstrzymując oddech na dziesiątki minut. Usłyszysz je, zanim cokolwiek zobaczysz.</p>
+</div>
+<div class="cap" data-in=".72" data-out=".84">
+  <div class="eyebrow">4000–6000 M · OTCHŁAŃ</div>
+  <h2>Zimne światło żywych</h2>
+  <p>Jedyne rozbłyski produkują same organizmy. Bioluminescencja to tutaj język: wabik, alarm i kamuflaż jednocześnie.</p>
+</div>
+<div class="cap center" data-in=".90" data-out="1">
+  <div class="eyebrow">~10 900 M · GŁĘBIA CHALLENGERA</div>
+  <h2>Dno.</h2>
+  <p>Ciśnienie ponad tysiąc atmosfer. Więcej ludzi było na Księżycu niż tutaj.</p>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const canvas = document.getElementById('scene');
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('scene'),antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, .1, 400);
-camera.position.set(0, 4, 26);
+const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, .1, 500);
 
-// ---- kolory stref (powierzchnia -> otchłań)
-const stops = [
-  {t:0.00, c:new THREE.Color('#8FE3DC')},
-  {t:0.18, c:new THREE.Color('#2E7D8C')},
-  {t:0.40, c:new THREE.Color('#12475C')},
-  {t:0.65, c:new THREE.Color('#06121F')},
-  {t:1.00, c:new THREE.Color('#020509')}
-];
-function lerpStops(t){
-  for(let i=0;i<stops.length-1;i++){
-    const a=stops[i], b=stops[i+1];
-    if(t>=a.t && t<=b.t){
-      return a.c.clone().lerp(b.c,(t-a.t)/(b.t-a.t));
-    }
-  }
-  return stops[stops.length-1].c.clone();
-}
-scene.fog = new THREE.Fog(0x8FE3DC, 8, 70);
+// ---------- kolory głębokości
+const stops=[[0,'#9BE8E0'],[.14,'#3B93A3'],[.30,'#155067'],[.48,'#071A2A'],[.70,'#030A12'],[1,'#010306']]
+  .map(([t,c])=>({t,c:new THREE.Color(c)}));
+function grade(t){for(let i=0;i<stops.length-1;i++){const a=stops[i],b=stops[i+1];
+  if(t>=a.t&&t<=b.t)return a.c.clone().lerp(b.c,(t-a.t)/(b.t-a.t));}return stops.at(-1).c.clone();}
+scene.fog=new THREE.FogExp2(0x9BE8E0,.028);
+const amb=new THREE.AmbientLight(0xffffff,1);scene.add(amb);
+const sun=new THREE.DirectionalLight(0xD9FBF5,1.4);sun.position.set(4,20,6);scene.add(sun);
 
-const amb = new THREE.AmbientLight(0xffffff, 1.0);
-const sun = new THREE.DirectionalLight(0xCFF6F0, 1.2);
-sun.position.set(3,10,4);
-scene.add(amb, sun);
-
-// ---- śnieg morski (particles)
-const SNOW = 3500, span = 300;
-const pos = new Float32Array(SNOW*3);
-for(let i=0;i<SNOW;i++){
-  pos[i*3]   = (Math.random()-.5)*70;
-  pos[i*3+1] = 20 - Math.random()*span;
-  pos[i*3+2] = (Math.random()-.5)*70;
-}
-const snowGeo = new THREE.BufferGeometry();
-snowGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-const snow = new THREE.Points(snowGeo, new THREE.PointsMaterial({
-  color:0xDDEBE9, size:.14, transparent:true, opacity:.75, depthWrite:false
+// ---------- powierzchnia wody (shader, widziana od dołu)
+const waterUni={uT:{value:0}};
+const water=new THREE.Mesh(new THREE.PlaneGeometry(300,300,120,120),new THREE.ShaderMaterial({
+  uniforms:waterUni,side:THREE.DoubleSide,transparent:true,
+  vertexShader:`uniform float uT;varying float vH;
+    void main(){vec3 p=position;
+    float h=sin(p.x*.25+uT*1.2)*.6+sin(p.y*.31-uT*.9)*.5+sin((p.x+p.y)*.12+uT*.6)*.9;
+    p.z+=h;vH=h;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+  fragmentShader:`varying float vH;
+    void main(){float l=smoothstep(-1.,1.6,vH);
+    vec3 c=mix(vec3(.30,.72,.70),vec3(.85,1.,.97),l);
+    gl_FragColor=vec4(c,.9);}`
 }));
-scene.add(snow);
+water.rotation.x=Math.PI/2;water.position.y=8;scene.add(water);
 
-// ---- bioluminescencja (świeci głęboko)
-const GLOW = 500;
-const gpos = new Float32Array(GLOW*3);
-for(let i=0;i<GLOW;i++){
-  gpos[i*3]   = (Math.random()-.5)*60;
-  gpos[i*3+1] = -70 - Math.random()*200;
-  gpos[i*3+2] = (Math.random()-.5)*60;
+// ---------- god rays (snopy światła)
+const rayMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{uO:{value:1}},side:THREE.DoubleSide,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec2 vUv;uniform float uO;
+    void main(){float a=(1.-vUv.y)*smoothstep(0.,.15,vUv.x)*smoothstep(1.,.85,vUv.x);
+    gl_FragColor=vec4(.75,1.,.95,a*a*.35*uO);}`});
+const rays=new THREE.Group();
+for(let i=0;i<9;i++){const r=new THREE.Mesh(new THREE.PlaneGeometry(2.2+Math.random()*2.5,70),rayMat);
+  r.position.set((Math.random()-.5)*44,-26,(Math.random()-.5)*30-6);
+  r.rotation.z=(Math.random()-.5)*.28;r.rotation.y=Math.random()*Math.PI;rays.add(r);}
+scene.add(rays);
+
+// ---------- śnieg morski
+const SNOW=4200,SPAN=340,sp=new Float32Array(SNOW*3);
+for(let i=0;i<SNOW;i++){sp[i*3]=(Math.random()-.5)*90;sp[i*3+1]=15-Math.random()*SPAN;sp[i*3+2]=(Math.random()-.5)*90;}
+const sGeo=new THREE.BufferGeometry();sGeo.setAttribute('position',new THREE.BufferAttribute(sp,3));
+scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xD7E8E6,size:.13,transparent:true,opacity:.7,depthWrite:false})));
+
+// ---------- meduzy (shaderowy puls dzwonu + macki)
+const jellyUni={uT:{value:0}};
+function jellyfish(x,y,z,s){
+  const g=new THREE.Group();
+  const bell=new THREE.Mesh(new THREE.SphereGeometry(1,28,18,0,Math.PI*2,0,Math.PI*.55),
+    new THREE.ShaderMaterial({uniforms:jellyUni,transparent:true,side:THREE.DoubleSide,
+    vertexShader:`uniform float uT;varying float vY;
+      void main(){vec3 p=position;float pulse=1.+.14*sin(uT*2.2+p.y*3.);
+      p.xz*=pulse;p.y*=(2.-pulse)*.9;vY=p.y;
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+    fragmentShader:`varying float vY;
+      void main(){float e=smoothstep(-.2,1.,vY);
+      gl_FragColor=vec4(mix(vec3(.35,.9,.75),vec3(.85,1.,.95),e),.34+.3*e);}`}));
+  g.add(bell);
+  const tm=new THREE.LineBasicMaterial({color:0x9FF5D8,transparent:true,opacity:.4});
+  for(let i=0;i<10;i++){
+    const pts=[];for(let j=0;j<=14;j++)pts.push(new THREE.Vector3(0,-j*.24,0));
+    const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),tm);
+    const a=i/10*Math.PI*2;l.position.set(Math.cos(a)*.55,0,Math.sin(a)*.55);
+    l.userData={a,ph:Math.random()*6};g.add(l);}
+  g.position.set(x,y,z);g.scale.setScalar(s);
+  g.userData.baseY=y;scene.add(g);return g;
 }
-const glowGeo = new THREE.BufferGeometry();
-glowGeo.setAttribute('position', new THREE.BufferAttribute(gpos,3));
-const glowMat = new THREE.PointsMaterial({
-  color:0x7CF0C4, size:.5, transparent:true, opacity:0,
-  blending:THREE.AdditiveBlending, depthWrite:false
-});
-scene.add(new THREE.Points(glowGeo, glowMat));
+const jellies=[jellyfish(-8,-62,-8,1.6),jellyfish(6,-72,-14,2.4),jellyfish(-3,-84,-5,1.1),
+  jellyfish(12,-92,-18,1.9),jellyfish(-13,-100,-12,1.4),jellyfish(2,-108,-9,.9)];
 
-// ---- stworzenia (wireframe) na różnych głębokościach
-const wire = c => new THREE.MeshBasicMaterial({color:c, wireframe:true, transparent:true, opacity:.5});
-const creatures = [];
-function addCreature(geo, mat, x,y,z, spin){
-  const m = new THREE.Mesh(geo, mat);
-  m.position.set(x,y,z); m.userData.spin = spin;
-  scene.add(m); creatures.push(m); return m;
+// ---------- kaszalot (sylwetka, lathe)
+const prof=[[0,0],[.7,.4],[2,.95],[4.5,1.25],[7.5,1.2],[10,.85],[12,.45],[13.5,.22],[14.5,.1],[15,0]]
+  .map(([x,r])=>new THREE.Vector2(r*1.4,x));
+const whale=new THREE.Group();
+const body=new THREE.Mesh(new THREE.LatheGeometry(prof,40),
+  new THREE.MeshStandardMaterial({color:0x0A1620,roughness:.9,metalness:0}));
+body.rotation.z=Math.PI/2;whale.add(body);
+const fluke=new THREE.Mesh(new THREE.ConeGeometry(2.6,4.5,3),body.material);
+fluke.rotation.z=Math.PI/2;fluke.scale.set(1,.5,2.4);fluke.position.x=15.6;whale.add(fluke);
+whale.position.set(-90,-185,-34);whale.rotation.y=.15;scene.add(whale);
+const whaleGlow=new THREE.PointLight(0x2A6D80,0,90);whaleGlow.position.set(0,-185,-60);scene.add(whaleGlow);
+
+// ---------- bioluminescencja (shader, falujący puls)
+const GLOW=900,gp=new Float32Array(GLOW*3),gph=new Float32Array(GLOW);
+for(let i=0;i<GLOW;i++){gp[i*3]=(Math.random()-.5)*80;gp[i*3+1]=-120-Math.random()*180;gp[i*3+2]=(Math.random()-.5)*80;gph[i]=Math.random()*6.28;}
+const gGeo=new THREE.BufferGeometry();
+gGeo.setAttribute('position',new THREE.BufferAttribute(gp,3));
+gGeo.setAttribute('ph',new THREE.BufferAttribute(gph,1));
+const glowUni={uT:{value:0},uO:{value:0}};
+scene.add(new THREE.Points(gGeo,new THREE.ShaderMaterial({uniforms:glowUni,transparent:true,
+  depthWrite:false,blending:THREE.AdditiveBlending,
+  vertexShader:`attribute float ph;uniform float uT;varying float vA;
+    void main(){vA=.5+.5*sin(uT*1.6+ph+position.y*.08);
+    vec4 mv=modelViewMatrix*vec4(position,1.);
+    gl_PointSize=(3.+vA*7.)*(60./-mv.z);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying float vA;uniform float uO;
+    void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
+    float a=(1.-d*2.)*vA*uO;gl_FragColor=vec4(.49,.94,.77,a);}`})));
+
+// ---------- dno
+const fg=new THREE.PlaneGeometry(220,220,90,90),fp=fg.attributes.position;
+for(let i=0;i<fp.count;i++){const x=fp.getX(i),y=fp.getY(i);
+  fp.setZ(i,Math.sin(x*.22)*Math.cos(y*.19)*1.8+Math.random()*.7);}
+fg.computeVertexNormals();
+const floor=new THREE.Mesh(fg,new THREE.MeshStandardMaterial({color:0x0C1B26,roughness:1}));
+floor.rotation.x=-Math.PI/2;floor.position.y=-305;scene.add(floor);
+const floorL=new THREE.PointLight(0x7CF0C4,0,55);floorL.position.set(0,-296,0);scene.add(floorL);
+
+// ---------- KEYFRAMES kamery (scroll = oś czasu filmu)
+const K=[
+  {t:0.00,p:[0,-5,16], l:[0,6,0],   f:74},
+  {t:0.10,p:[0,-16,13],l:[0,-8,0],  f:68},
+  {t:0.20,p:[8,-52,12],l:[-2,-66,-8],f:62},
+  {t:0.32,p:[-7,-88,11],l:[3,-98,-10],f:60},
+  {t:0.44,p:[0,-135,9],l:[0,-142,-24],f:44},   // dolly-in w ciemność
+  {t:0.55,p:[0,-172,18],l:[-14,-184,-40],f:72}, // szeroki kadr na kaszalota
+  {t:0.68,p:[5,-210,12],l:[0,-222,-12],f:62},
+  {t:0.82,p:[-3,-262,11],l:[0,-272,-10],f:58},
+  {t:1.00,p:[0,-297,7], l:[0,-304,-16],f:52},
+];
+const sm=t=>t*t*(3-2*t);
+function cam(t){
+  let i=0;while(i<K.length-2&&t>K[i+1].t)i++;
+  const a=K[i],b=K[i+1],u=sm(Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t))));
+  camera.position.set(a.p[0]+(b.p[0]-a.p[0])*u,a.p[1]+(b.p[1]-a.p[1])*u,a.p[2]+(b.p[2]-a.p[2])*u);
+  camera.lookAt(a.l[0]+(b.l[0]-a.l[0])*u,a.l[1]+(b.l[1]-a.l[1])*u,a.l[2]+(b.l[2]-a.l[2])*u);
+  camera.fov=a.f+(b.f-a.f)*u;camera.updateProjectionMatrix();
 }
-addCreature(new THREE.IcosahedronGeometry(2.4,1), wire(0x9FDCD6), -7,-38,-6, .003);   // meduza / zmierzch
-addCreature(new THREE.IcosahedronGeometry(1.4,0), wire(0x9FDCD6),  8,-55, -10,-.004);
-addCreature(new THREE.TorusKnotGeometry(2.2,.5,90,10), wire(0x7CF0C4), 6,-110,-8, .002); // strefa północy
-addCreature(new THREE.IcosahedronGeometry(3.2,1), wire(0x7CF0C4), -9,-150,-14,-.0015);
-addCreature(new THREE.ConeGeometry(2.5,9,7,3,true), wire(0x4FB89A), 7,-205,-10, .001);   // otchłań
 
-// ---- dno
-const floorGeo = new THREE.PlaneGeometry(160,160,60,60);
-const fp = floorGeo.attributes.position;
-for(let i=0;i<fp.count;i++){ fp.setZ(i, Math.random()*1.6); }
-floorGeo.computeVertexNormals();
-const seafloor = new THREE.Mesh(floorGeo, new THREE.MeshStandardMaterial({color:0x0B1A24, roughness:1}));
-seafloor.rotation.x = -Math.PI/2;
-seafloor.position.y = -262;
-scene.add(seafloor);
-const floorLight = new THREE.PointLight(0x7CF0C4, 0, 40);
-floorLight.position.set(0,-254,0);
-scene.add(floorLight);
-
-// ---- scroll -> stan
-const MAXD = 10900;
-let target = 0, current = 0;
-const mEl=document.getElementById('m'), atmEl=document.getElementById('atm'),
-      tEl=document.getElementById('temp'), zEl=document.getElementById('zone'),
-      hint=document.getElementById('hint');
+// ---------- scroll / HUD / napisy / letterbox
+const MAXD=10900;let target=0,cur=0;
+const caps=[...document.querySelectorAll('.cap')].map(el=>({el,a:+el.dataset.in,b:+el.dataset.out}));
+const mEl=m.valueOf?document.getElementById('m'):null;
+const $=id=>document.getElementById(id);
 const zones=[[0,'POWIERZCHNIA'],[200,'STREFA ZMIERZCHU'],[1000,'STREFA PÓŁNOCY'],[4000,'OTCHŁAŃ'],[6000,'STREFA HADALNA']];
-function frac(){
-  const h = document.documentElement;
-  return Math.min(1, h.scrollTop / (h.scrollHeight - h.clientHeight));
-}
-addEventListener('scroll', ()=>{ target = frac(); hint.classList.toggle('hidden', target>0.02); }, {passive:true});
+function frac(){const h=document.documentElement;return Math.min(1,h.scrollTop/(h.scrollHeight-h.clientHeight));}
+addEventListener('scroll',()=>{target=frac();$('hint').style.opacity=target>.015?0:1;},{passive:true});
+function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);resize();
 
-function resize(){
-  renderer.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-}
-addEventListener('resize', resize); resize();
+// ziarno filmowe
+const gcx=$('gc').getContext('2d');let gf=0;
+function grain(){if(reduced)return;if(++gf%3)return;
+  const d=gcx.createImageData(140,140);
+  for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}
+  gcx.putImageData(d,0,0);}
 
-let t0 = 0;
+let t0=0;
 function tick(time){
   requestAnimationFrame(tick);
-  const dt = Math.min(50, time - t0); t0 = time;
-  current += (target - current) * (reduced ? 1 : .06);
+  const dt=Math.min(50,time-t0);t0=time;const T=time*.001;
+  cur+=(target-cur)*(reduced?1:.07);
+  cam(cur);
+  camera.position.x+=Math.sin(T*.5)*.15;      // dryf prądu
+  camera.position.y+=Math.sin(T*.8)*.08;
 
-  // kamera w dół
-  camera.position.y = 4 - current * 260;
-  camera.position.x = Math.sin(current*Math.PI*2)*1.2;
-  camera.rotation.z = Math.sin(current*Math.PI*4)*0.015;
+  // grading
+  const col=grade(cur);
+  scene.fog.color.copy(col);renderer.setClearColor(col);
+  scene.fog.density=.028+cur*.012;
+  amb.intensity=Math.max(.1,1-cur*1.5);
+  sun.intensity=Math.max(0,1.4-cur*4);
+  rayMat.uniforms.uO.value=Math.max(0,1-cur*5.5);
+  water.visible=cur<.2;rays.visible=cur<.22;
+  glowUni.uO.value=Math.min(1,Math.max(0,(cur-.42)*2.5));
+  floorL.intensity=Math.max(0,(cur-.82))*20;
 
-  // światło i mgła
-  const col = lerpStops(current);
-  scene.fog.color.copy(col);
-  renderer.setClearColor(col);
-  amb.intensity = Math.max(.12, 1.0 - current*1.4);
-  sun.intensity = Math.max(0, 1.2 - current*3);
-  glowMat.opacity = Math.min(.95, Math.max(0,(current-.28)*2.2));
-  floorLight.intensity = Math.max(0,(current-.85))*14;
+  // shadery czasowe
+  waterUni.uT.value=T;jellyUni.uT.value=T;glowUni.uT.value=T;
 
-  // ruchy
-  if(!reduced){
-    for(const c of creatures){ c.rotation.y += c.userData.spin*dt; c.rotation.x += c.userData.spin*.6*dt; }
-    const p = snowGeo.attributes.position;
-    for(let i=0;i<SNOW;i++){
-      let y = p.getY(i) - .0016*dt;
-      if(y < 20-span) y = 20;
-      p.setY(i,y);
-    }
-    p.needsUpdate = true;
+  // meduzy: dryf + falowanie macek
+  for(const j of jellies){
+    if(!reduced){j.position.y=j.userData.baseY+Math.sin(T*.7+j.userData.baseY)*1.2;
+      j.rotation.y+=.0008*dt;}
+    for(const c of j.children)if(c.isLine){
+      const p=c.geometry.attributes.position;
+      for(let k=1;k<p.count;k++)p.setX(k,Math.sin(T*2+c.userData.ph+k*.5)*.06*k);
+      p.needsUpdate=true;}
+  }
+
+  // kaszalot: przepływ sterowany WYŁĄCZNIE scrollem (0.50→0.66)
+  const wp=Math.min(1,Math.max(0,(cur-.50)/.16));
+  whale.position.x=-95+wp*190;
+  whale.position.y=-185+Math.sin(wp*Math.PI)*6;
+  whale.rotation.x=Math.sin(wp*Math.PI*2)*.06;
+  fluke.rotation.x=Math.sin(wp*26)*.5;
+  whaleGlow.intensity=Math.sin(wp*Math.PI)*3;
+
+  // śnieg
+  if(!reduced){const p=sGeo.attributes.position;
+    for(let i=0;i<SNOW;i++){let y=p.getY(i)-.0015*dt;if(y<15-SPAN)y=15;p.setY(i,y);}
+    p.needsUpdate=true;}
+
+  // letterbox przy momentach kinowych
+  const lb=Math.max(Math.min(1,(cur-.40)/.05)*Math.min(1,(.68-cur)/.05),
+                    Math.min(1,(cur-.88)/.05));
+  const h=Math.max(0,lb)*7;
+  $('barT').style.height=$('barB').style.height=h+'vh';
+
+  // napisy
+  for(const c of caps){
+    const w=c.b-c.a,e=Math.min((cur-c.a)/(w*.25),(c.b-cur)/(w*.25));
+    const o=Math.max(0,Math.min(1,e));
+    c.el.style.opacity=o;
+    const base=c.el.classList.contains('center')?'translate(-50%,':'translate(0,';
+    c.el.style.transform=base+(-40+(1-o)*4)+'%)';
   }
 
   // HUD
-  const d = Math.round(current*MAXD);
-  mEl.textContent = d.toLocaleString('pl-PL');
-  atmEl.textContent = Math.round(1 + d/10).toLocaleString('pl-PL');
-  tEl.textContent = Math.max(1, Math.round(22 - Math.min(d,1000)/1000*18 - Math.min(Math.max(d-1000,0),9900)/9900*3));
-  let zn = zones[0][1];
-  for(const [dep,name] of zones){ if(d>=dep) zn = name; }
-  zEl.textContent = zn;
+  const d=Math.round(cur*MAXD);
+  $('m').textContent=d.toLocaleString('pl-PL');
+  $('atm').textContent=Math.round(1+d/10).toLocaleString('pl-PL');
+  $('temp').textContent=Math.max(1,Math.round(22-Math.min(d,1000)/1000*18-Math.min(Math.max(d-1000,0),9900)/9900*3));
+  let zn=zones[0][1];for(const[dep,n]of zones)if(d>=dep)zn=n;$('zone').textContent=zn;
 
-  renderer.render(scene, camera);
+  grain();
+  renderer.render(scene,camera);
 }
 requestAnimationFrame(tick);
 </script>
