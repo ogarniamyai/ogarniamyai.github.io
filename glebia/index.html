@@ -9,37 +9,48 @@
 <style>
 :root{--biolum:#7CF0C4;--text:#EAF6F4}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#020509;color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
-#spacer{height:1400vh}
+body{background:#010306;color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+#spacer{height:1600vh}
 #scene{position:fixed;inset:0;z-index:0}
-/* film layers */
 #vignette{position:fixed;inset:0;z-index:3;pointer-events:none;
-  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)}
-#grain{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.06;mix-blend-mode:overlay}
+  background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.6) 100%)}
+#grain{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.055;mix-blend-mode:overlay}
 #grain canvas{width:100%;height:100%}
-.bar{position:fixed;left:0;width:100%;height:0;background:#000;z-index:6;transition:none}
+.bar{position:fixed;left:0;width:100%;height:0;background:#000;z-index:6}
 #barT{top:0}#barB{bottom:0}
-/* HUD */
-.hud{position:fixed;top:24px;right:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
+/* kadr "nagrania" pod rolkę */
+.rec{position:fixed;z-index:9;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:.12em;color:rgba(234,246,244,.85);pointer-events:none;text-shadow:0 1px 8px rgba(0,0,0,.8)}
+#recTL{top:22px;left:24px}
+#recTL .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#FF4D4D;
+  margin-right:8px;animation:blink 1.2s steps(1) infinite;vertical-align:1px}
+@keyframes blink{50%{opacity:.15}}
+#recBL{bottom:22px;left:24px;color:rgba(234,246,244,.55);font-size:10px}
+#recBL a{color:var(--biolum);text-decoration:none}
+.corner{position:fixed;width:26px;height:26px;z-index:9;pointer-events:none;
+  border:2px solid rgba(234,246,244,.35)}
+#c1{top:14px;left:14px;border-right:0;border-bottom:0}
+#c2{top:14px;right:14px;border-left:0;border-bottom:0}
+#c3{bottom:14px;left:14px;border-right:0;border-top:0}
+#c4{bottom:14px;right:14px;border-left:0;border-top:0}
+.hud{position:fixed;top:22px;right:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
   text-align:right;font-size:12px;line-height:1.7;color:var(--biolum);
-  background:rgba(2,5,9,.3);padding:12px 16px;border:1px solid rgba(124,240,196,.2);backdrop-filter:blur(4px)}
+  background:rgba(2,5,9,.28);padding:12px 16px;border:1px solid rgba(124,240,196,.2);backdrop-filter:blur(4px)}
 .hud .depth{font-size:26px;font-weight:600}
 .hud .unit{font-size:13px;opacity:.7}
-/* cinematic captions — all fixed, scroll only drives them */
 .cap{position:fixed;z-index:8;left:8vw;top:50%;transform:translateY(-40%);
   max-width:600px;opacity:0;pointer-events:none;will-change:opacity,transform}
 .cap.center{left:50%;text-align:center;transform:translate(-50%,-40%)}
 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;color:var(--biolum);margin-bottom:14px}
-h1,h2{font-family:'Syne',sans-serif;font-weight:800;line-height:1.04;text-shadow:0 2px 30px rgba(0,0,0,.6)}
+h1,h2{font-family:'Syne',sans-serif;font-weight:800;line-height:1.04;text-shadow:0 2px 34px rgba(0,0,0,.7)}
 h1{font-size:clamp(52px,10vw,130px);letter-spacing:-.02em}
-h2{font-size:clamp(30px,5vw,58px);margin-bottom:16px}
-p{font-size:16px;line-height:1.7;color:rgba(234,246,244,.85);max-width:44ch;text-shadow:0 1px 16px rgba(0,0,0,.7)}
+h2{font-size:clamp(28px,5vw,58px);margin-bottom:16px}
+p{font-size:16px;line-height:1.7;color:rgba(234,246,244,.88);max-width:44ch;text-shadow:0 1px 18px rgba(0,0,0,.8)}
 .cap.center p{margin:0 auto}
-.scrollhint{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:10;
-  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(234,246,244,.6)}
-.credit{position:fixed;bottom:20px;left:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
-  font-size:10px;letter-spacing:.15em;color:rgba(234,246,244,.4)}
-.credit a{color:var(--biolum);text-decoration:none}
+.scrollhint{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);z-index:10;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(234,246,244,.6);transition:opacity .4s}
+@media(max-width:640px){.hud{font-size:11px;padding:10px 12px}.hud .depth{font-size:21px}
+  .cap{left:7vw;max-width:86vw}p{font-size:14.5px}}
 </style>
 </head>
 <body>
@@ -48,6 +59,11 @@ p{font-size:16px;line-height:1.7;color:rgba(234,246,244,.85);max-width:44ch;text
 <div id="vignette"></div>
 <div id="grain"><canvas id="gc" width="140" height="140"></canvas></div>
 <div class="bar" id="barT"></div><div class="bar" id="barB"></div>
+<div class="corner" id="c1"></div><div class="corner" id="c2"></div>
+<div class="corner" id="c3"></div><div class="corner" id="c4"></div>
+
+<div class="rec" id="recTL"><span class="dot"></span>REC &nbsp;T+<span id="tc">00:00</span></div>
+<div class="rec" id="recBL">DSV „OGARNIAMY-1" · CAM A · NAPISANE PRZEZ CLAUDE · <a href="https://ogarniamy.ai">ogarniamy.ai</a></div>
 
 <div class="hud" aria-hidden="true">
   <div class="depth"><span id="m">0</span><span class="unit"> m</span></div>
@@ -55,34 +71,34 @@ p{font-size:16px;line-height:1.7;color:rgba(234,246,244,.85);max-width:44ch;text
   <div id="zone">POWIERZCHNIA</div>
 </div>
 <div class="scrollhint" id="hint">SCROLL = ZANURZENIE ▼</div>
-<div class="credit">NAPISANE PRZEZ CLAUDE · <a href="https://ogarniamy.ai">ogarniamy.ai</a></div>
 
-<div class="cap center" data-in="0" data-out=".08">
+<div class="cap center" data-in="0" data-out=".07">
   <div class="eyebrow">EKSPEDYCJA · 10 900 M W DÓŁ</div>
   <h1>GŁĘBIA</h1>
 </div>
-<div class="cap" data-in=".10" data-out=".20">
+<div class="cap" data-in=".09" data-out=".18">
   <div class="eyebrow">0–200 M · STREFA EUFOTYCZNA</div>
   <h2>Tu jeszcze sięga słońce</h2>
-  <p>Snopy światła nad tobą to ostatnie, co zobaczysz ze słońca. Poniżej dwustu metrów fotosynteza ustaje — razem z kolorami.</p>
+  <p>Kaustyki i snopy światła nad tobą to ostatnie, co zobaczysz ze słońca. Poniżej dwustu metrów kolory gasną jeden po drugim.</p>
 </div>
-<div class="cap" data-in=".24" data-out=".36">
+<div class="cap" data-in=".22" data-out=".34">
   <div class="eyebrow">200–1000 M · STREFA ZMIERZCHU</div>
-  <h2>Puls meduz</h2>
-  <p>Wokół opada śnieg morski — pokarm całych głębin dryfujący tygodniami na dno. Między drobinami pulsują meduzy.</p>
+  <h2>Ławice i puls meduz</h2>
+  <p>Wokół opada śnieg morski — pokarm całych głębin. Między drobinami krążą ławice i pulsują meduzy.</p>
 </div>
-<div class="cap center" data-in=".42" data-out=".52">
+<div class="cap center" data-in=".40" data-out=".50">
   <h2>Od tego miejsca światło nie istnieje.</h2>
+  <p>Włączamy reflektory.</p>
 </div>
-<div class="cap" data-in=".56" data-out=".68">
+<div class="cap" data-in=".54" data-out=".66">
   <div class="eyebrow">1000–4000 M · STREFA PÓŁNOCY</div>
   <h2>Coś dużego</h2>
-  <p>Kaszaloty nurkują tu na połowy głębiej niż kilometr, wstrzymując oddech na dziesiątki minut. Usłyszysz je, zanim cokolwiek zobaczysz.</p>
+  <p>Kaszaloty nurkują tu wstrzymując oddech na dziesiątki minut. Usłyszysz je, zanim cokolwiek zobaczysz.</p>
 </div>
-<div class="cap" data-in=".72" data-out=".84">
+<div class="cap" data-in=".70" data-out=".82">
   <div class="eyebrow">4000–6000 M · OTCHŁAŃ</div>
   <h2>Zimne światło żywych</h2>
-  <p>Jedyne rozbłyski produkują same organizmy. Bioluminescencja to tutaj język: wabik, alarm i kamuflaż jednocześnie.</p>
+  <p>Jedyne rozbłyski produkują same organizmy. To język: wabik, alarm i kamuflaż jednocześnie. Nie podążaj za lampką.</p>
 </div>
 <div class="cap center" data-in=".90" data-out="1">
   <div class="eyebrow">~10 900 M · GŁĘBIA CHALLENGERA</div>
@@ -92,225 +108,350 @@ p{font-size:16px;line-height:1.7;color:rgba(234,246,244,.85);max-width:44ch;text
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('scene'),antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, .1, 500);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOBILE=Math.min(innerWidth,innerHeight)<620;
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('scene'),antialias:!MOBILE});
+renderer.setPixelRatio(Math.min(devicePixelRatio,MOBILE?1.6:2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+renderer.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,500);
+scene.add(camera); // konieczne dla reflektora podczepionego pod kamerę
 
-// ---------- kolory głębokości
-const stops=[[0,'#9BE8E0'],[.14,'#3B93A3'],[.30,'#155067'],[.48,'#071A2A'],[.70,'#030A12'],[1,'#010306']]
+// ------- grading głębokości
+const stops=[[0,'#9FE9E1'],[.12,'#46A0AE'],[.26,'#1A5A70'],[.42,'#0A2436'],[.58,'#04101C'],[.78,'#02080F'],[1,'#010305']]
   .map(([t,c])=>({t,c:new THREE.Color(c)}));
 function grade(t){for(let i=0;i<stops.length-1;i++){const a=stops[i],b=stops[i+1];
-  if(t>=a.t&&t<=b.t)return a.c.clone().lerp(b.c,(t-a.t)/(b.t-a.t));}return stops.at(-1).c.clone();}
-scene.fog=new THREE.FogExp2(0x9BE8E0,.028);
+  if(t>=a.t&&t<=b.t){const u=(t-a.t)/(b.t-a.t);return a.c.clone().lerp(b.c,u*u*(3-2*u));}}
+  return stops.at(-1).c.clone();}
+scene.fog=new THREE.FogExp2(0x9FE9E1,.026);
 const amb=new THREE.AmbientLight(0xffffff,1);scene.add(amb);
-const sun=new THREE.DirectionalLight(0xD9FBF5,1.4);sun.position.set(4,20,6);scene.add(sun);
+const sun=new THREE.DirectionalLight(0xE2FFF8,1.5);sun.position.set(4,20,6);scene.add(sun);
+const hemi=new THREE.HemisphereLight(0xBFF2EA,0x03141C,.5);scene.add(hemi);
 
-// ---------- powierzchnia wody (shader, widziana od dołu)
+// ------- powierzchnia wody (od dołu)
 const waterUni={uT:{value:0}};
-const water=new THREE.Mesh(new THREE.PlaneGeometry(300,300,120,120),new THREE.ShaderMaterial({
+const water=new THREE.Mesh(new THREE.PlaneGeometry(340,340,150,150),new THREE.ShaderMaterial({
   uniforms:waterUni,side:THREE.DoubleSide,transparent:true,
-  vertexShader:`uniform float uT;varying float vH;
-    void main(){vec3 p=position;
-    float h=sin(p.x*.25+uT*1.2)*.6+sin(p.y*.31-uT*.9)*.5+sin((p.x+p.y)*.12+uT*.6)*.9;
+  vertexShader:`uniform float uT;varying float vH;varying vec2 vUv;
+    void main(){vec3 p=position;vUv=uv;
+    float h=sin(p.x*.24+uT*1.15)*.6+sin(p.y*.3-uT*.85)*.55+sin((p.x+p.y)*.11+uT*.55)*.95+sin(p.x*.61-uT*1.7)*.2;
     p.z+=h;vH=h;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
-  fragmentShader:`varying float vH;
-    void main(){float l=smoothstep(-1.,1.6,vH);
-    vec3 c=mix(vec3(.30,.72,.70),vec3(.85,1.,.97),l);
-    gl_FragColor=vec4(c,.9);}`
+  fragmentShader:`varying float vH;varying vec2 vUv;
+    void main(){float l=smoothstep(-1.1,1.8,vH);
+    vec3 c=mix(vec3(.26,.68,.66),vec3(.92,1.,.98),l*l);
+    float edge=smoothstep(.5,.1,distance(vUv,vec2(.5)));
+    gl_FragColor=vec4(c,.92*edge+.2);}`
 }));
 water.rotation.x=Math.PI/2;water.position.y=8;scene.add(water);
 
-// ---------- god rays (snopy światła)
-const rayMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-  uniforms:{uO:{value:1}},side:THREE.DoubleSide,
+// ------- kaustyki: tańcząca siatka światła w toni
+{const cUni={uT:{value:0},uO:{value:1}};window.caustUni=cUni;
+const caust=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShaderMaterial({
+  uniforms:cUni,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-  fragmentShader:`varying vec2 vUv;uniform float uO;
-    void main(){float a=(1.-vUv.y)*smoothstep(0.,.15,vUv.x)*smoothstep(1.,.85,vUv.x);
-    gl_FragColor=vec4(.75,1.,.95,a*a*.35*uO);}`});
+  fragmentShader:`varying vec2 vUv;uniform float uT;uniform float uO;
+    float cell(vec2 p){p=fract(p)-.5;return length(p);}
+    void main(){vec2 u=vUv*26.;
+    float c=0.;
+    c+=1.-smoothstep(0.,.45,cell(u+vec2(sin(uT*.7+u.y*.5)*.3,uT*.15)));
+    c+=1.-smoothstep(0.,.4,cell(u*1.4+vec2(uT*.1,cos(uT*.6+u.x*.4)*.3)));
+    c=pow(c*.6,3.);
+    float edge=smoothstep(.5,.15,distance(vUv,vec2(.5)));
+    gl_FragColor=vec4(.8,1.,.95,c*.5*uO*edge);}`
+}));
+caust.rotation.x=Math.PI/2;caust.position.y=-4;scene.add(caust);window.caust=caust;}
+
+// ------- god rays
+const rayMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{uO:{value:1},uT:{value:0}},side:THREE.DoubleSide,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec2 vUv;uniform float uO;uniform float uT;
+    void main(){float sway=.5+.5*sin(uT*.8+vUv.x*6.);
+    float a=(1.-vUv.y)*smoothstep(0.,.18,vUv.x)*smoothstep(1.,.82,vUv.x);
+    gl_FragColor=vec4(.78,1.,.96,a*a*.4*uO*(.6+.4*sway));}`});
 const rays=new THREE.Group();
-for(let i=0;i<9;i++){const r=new THREE.Mesh(new THREE.PlaneGeometry(2.2+Math.random()*2.5,70),rayMat);
-  r.position.set((Math.random()-.5)*44,-26,(Math.random()-.5)*30-6);
-  r.rotation.z=(Math.random()-.5)*.28;r.rotation.y=Math.random()*Math.PI;rays.add(r);}
+for(let i=0;i<10;i++){const r=new THREE.Mesh(new THREE.PlaneGeometry(2+Math.random()*3,80),rayMat);
+  r.position.set((Math.random()-.5)*50,-28,(Math.random()-.5)*34-6);
+  r.rotation.z=(Math.random()-.5)*.3;r.rotation.y=Math.random()*Math.PI;rays.add(r);}
 scene.add(rays);
 
-// ---------- śnieg morski
-const SNOW=4200,SPAN=340,sp=new Float32Array(SNOW*3);
-for(let i=0;i<SNOW;i++){sp[i*3]=(Math.random()-.5)*90;sp[i*3+1]=15-Math.random()*SPAN;sp[i*3+2]=(Math.random()-.5)*90;}
-const sGeo=new THREE.BufferGeometry();sGeo.setAttribute('position',new THREE.BufferAttribute(sp,3));
-scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xD7E8E6,size:.13,transparent:true,opacity:.7,depthWrite:false})));
+// ------- bąble startowe (unoszą się)
+const NB=MOBILE?60:120,bp=new Float32Array(NB*3);
+for(let i=0;i<NB;i++){bp[i*3]=(Math.random()-.5)*26;bp[i*3+1]=-30+Math.random()*36;bp[i*3+2]=(Math.random()-.5)*22;}
+const bGeo=new THREE.BufferGeometry();bGeo.setAttribute('position',new THREE.BufferAttribute(bp,3));
+const bubbles=new THREE.Points(bGeo,new THREE.PointsMaterial({color:0xEFFFFB,size:.22,transparent:true,opacity:.85,depthWrite:false}));
+scene.add(bubbles);
 
-// ---------- meduzy (shaderowy puls dzwonu + macki)
+// ------- śnieg morski
+const SNOW=MOBILE?2200:4200,SPAN=350,sp2=new Float32Array(SNOW*3);
+for(let i=0;i<SNOW;i++){sp2[i*3]=(Math.random()-.5)*95;sp2[i*3+1]=15-Math.random()*SPAN;sp2[i*3+2]=(Math.random()-.5)*95;}
+const sGeo=new THREE.BufferGeometry();sGeo.setAttribute('position',new THREE.BufferAttribute(sp2,3));
+scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xD7E8E6,size:.12,transparent:true,opacity:.65,depthWrite:false})));
+
+// ------- ŁAWICA RYB (InstancedMesh)
+const NF=MOBILE?90:170;
+const fishGeo=new THREE.ConeGeometry(.09,.5,4);fishGeo.rotateX(Math.PI/2);
+const fish=new THREE.InstancedMesh(fishGeo,
+  new THREE.MeshStandardMaterial({color:0x9FB8BC,roughness:.4,metalness:.5,emissive:0x16333A,emissiveIntensity:.4}),NF);
+const fdat=[];for(let i=0;i<NF;i++)fdat.push({r:5+Math.random()*9,sp:.25+Math.random()*.3,
+  ph:Math.random()*6.28,yo:(Math.random()-.5)*7,w:1+Math.random()*2});
+fish.position.set(6,-70,-16);scene.add(fish);
+const dummy=new THREE.Object3D();
+
+// ------- meduzy
 const jellyUni={uT:{value:0}};
-function jellyfish(x,y,z,s){
+function jellyfish(x,y,z,s,hue){
   const g=new THREE.Group();
-  const bell=new THREE.Mesh(new THREE.SphereGeometry(1,28,18,0,Math.PI*2,0,Math.PI*.55),
-    new THREE.ShaderMaterial({uniforms:jellyUni,transparent:true,side:THREE.DoubleSide,
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1,30,20,0,Math.PI*2,0,Math.PI*.55),
+    new THREE.ShaderMaterial({uniforms:{uT:jellyUni.uT,uH:{value:hue}},transparent:true,side:THREE.DoubleSide,depthWrite:false,
     vertexShader:`uniform float uT;varying float vY;
-      void main(){vec3 p=position;float pulse=1.+.14*sin(uT*2.2+p.y*3.);
+      void main(){vec3 p=position;float pulse=1.+.15*sin(uT*2.1+p.y*3.);
       p.xz*=pulse;p.y*=(2.-pulse)*.9;vY=p.y;
       gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
-    fragmentShader:`varying float vY;
+    fragmentShader:`varying float vY;uniform float uH;
       void main(){float e=smoothstep(-.2,1.,vY);
-      gl_FragColor=vec4(mix(vec3(.35,.9,.75),vec3(.85,1.,.95),e),.34+.3*e);}`}));
-  g.add(bell);
-  const tm=new THREE.LineBasicMaterial({color:0x9FF5D8,transparent:true,opacity:.4});
-  for(let i=0;i<10;i++){
-    const pts=[];for(let j=0;j<=14;j++)pts.push(new THREE.Vector3(0,-j*.24,0));
+      vec3 a=mix(vec3(.3,.85,.72),vec3(.85,.55,.9),uH);
+      gl_FragColor=vec4(mix(a,vec3(.9,1.,.97),e),.3+.32*e);}`})));
+  const tm=new THREE.LineBasicMaterial({color:hue>.5?0xE0B7F5:0x9FF5D8,transparent:true,opacity:.42});
+  for(let i=0;i<11;i++){const pts=[];for(let j=0;j<=15;j++)pts.push(new THREE.Vector3(0,-j*.23,0));
     const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),tm);
-    const a=i/10*Math.PI*2;l.position.set(Math.cos(a)*.55,0,Math.sin(a)*.55);
-    l.userData={a,ph:Math.random()*6};g.add(l);}
-  g.position.set(x,y,z);g.scale.setScalar(s);
-  g.userData.baseY=y;scene.add(g);return g;
-}
-const jellies=[jellyfish(-8,-62,-8,1.6),jellyfish(6,-72,-14,2.4),jellyfish(-3,-84,-5,1.1),
-  jellyfish(12,-92,-18,1.9),jellyfish(-13,-100,-12,1.4),jellyfish(2,-108,-9,.9)];
+    const a=i/11*Math.PI*2;l.position.set(Math.cos(a)*.55,0,Math.sin(a)*.55);
+    l.userData={ph:Math.random()*6};g.add(l);}
+  g.position.set(x,y,z);g.scale.setScalar(s);g.userData.baseY=y;scene.add(g);return g;}
+const jellies=[jellyfish(-8,-60,-8,1.6,0),jellyfish(6,-72,-14,2.5,0),jellyfish(-3,-84,-5,1.1,.8),
+  jellyfish(12,-92,-18,1.9,0),jellyfish(-13,-100,-12,1.4,.9),jellyfish(2,-108,-9,.9,0),jellyfish(-18,-76,-20,2.1,0)];
 
-// ---------- kaszalot (sylwetka, lathe)
-const prof=[[0,0],[.7,.4],[2,.95],[4.5,1.25],[7.5,1.2],[10,.85],[12,.45],[13.5,.22],[14.5,.1],[15,0]]
-  .map(([x,r])=>new THREE.Vector2(r*1.4,x));
+// ------- kaszalot
+const prof=[[0,0],[.7,.42],[2,1],[4.5,1.3],[7.5,1.25],[10,.9],[12,.48],[13.5,.24],[14.5,.1],[15,0]]
+  .map(([x,r])=>new THREE.Vector2(r*1.45,x));
 const whale=new THREE.Group();
-const body=new THREE.Mesh(new THREE.LatheGeometry(prof,40),
-  new THREE.MeshStandardMaterial({color:0x0A1620,roughness:.9,metalness:0}));
-body.rotation.z=Math.PI/2;whale.add(body);
-const fluke=new THREE.Mesh(new THREE.ConeGeometry(2.6,4.5,3),body.material);
-fluke.rotation.z=Math.PI/2;fluke.scale.set(1,.5,2.4);fluke.position.x=15.6;whale.add(fluke);
-whale.position.set(-90,-185,-34);whale.rotation.y=.15;scene.add(whale);
-const whaleGlow=new THREE.PointLight(0x2A6D80,0,90);whaleGlow.position.set(0,-185,-60);scene.add(whaleGlow);
+const wMat=new THREE.MeshStandardMaterial({color:0x0B1822,roughness:.85});
+const body=new THREE.Mesh(new THREE.LatheGeometry(prof,52),wMat);body.rotation.z=Math.PI/2;whale.add(body);
+const fluke=new THREE.Mesh(new THREE.ConeGeometry(2.7,4.6,3),wMat);
+fluke.rotation.z=Math.PI/2;fluke.scale.set(1,.5,2.5);fluke.position.x=15.7;whale.add(fluke);
+for(const s of[-1,1]){const fin=new THREE.Mesh(new THREE.ConeGeometry(1.1,2.6,3),wMat);
+  fin.scale.set(1,.4,1.8);fin.position.set(4.5,-1,s*1.6);fin.rotation.z=-.5;whale.add(fin);}
+whale.position.set(-95,-185,-36);whale.rotation.y=.15;scene.add(whale);
+const whaleGlow=new THREE.PointLight(0x2F7A8E,0,100);whaleGlow.position.set(0,-183,-60);scene.add(whaleGlow);
 
-// ---------- bioluminescencja (shader, falujący puls)
-const GLOW=900,gp=new Float32Array(GLOW*3),gph=new Float32Array(GLOW);
-for(let i=0;i<GLOW;i++){gp[i*3]=(Math.random()-.5)*80;gp[i*3+1]=-120-Math.random()*180;gp[i*3+2]=(Math.random()-.5)*80;gph[i]=Math.random()*6.28;}
+// ------- REFLEKTOR batyskafu (spot + widoczny stożek)
+const spot=new THREE.SpotLight(0xCFF8EC,0,70,.55,.55,1.2);
+camera.add(spot);spot.position.set(0,-.5,0);
+const spotTarget=new THREE.Object3D();spotTarget.position.set(0,-.2,-10);camera.add(spotTarget);spot.target=spotTarget;
+const coneGeo=new THREE.ConeGeometry(5.5,30,32,1,true);coneGeo.translate(0,-15,0);
+const coneMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
+  uniforms:{uO:{value:0}},
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec2 vUv;uniform float uO;
+    void main(){float a=pow(vUv.y,2.2)*.16*uO;gl_FragColor=vec4(.7,1.,.9,a);}`});
+const cone=new THREE.Mesh(coneGeo,coneMat);
+cone.rotation.x=Math.PI/2;cone.position.set(0,-.5,-.5);camera.add(cone);
+
+// ------- pył w świetle reflektora (blisko kamery)
+const ND=MOBILE?200:400,dp=new Float32Array(ND*3);
+for(let i=0;i<ND;i++){dp[i*3]=(Math.random()-.5)*10;dp[i*3+1]=(Math.random()-.5)*8;dp[i*3+2]=-2-Math.random()*16;}
+const dGeo=new THREE.BufferGeometry();dGeo.setAttribute('position',new THREE.BufferAttribute(dp,3));
+const dustMat=new THREE.PointsMaterial({color:0xBFEFE2,size:.05,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending});
+camera.add(new THREE.Points(dGeo,dustMat));
+
+// ------- bioluminescencja
+const GLOW=MOBILE?550:900,gp=new Float32Array(GLOW*3),gph=new Float32Array(GLOW);
+for(let i=0;i<GLOW;i++){gp[i*3]=(Math.random()-.5)*85;gp[i*3+1]=-120-Math.random()*185;gp[i*3+2]=(Math.random()-.5)*85;gph[i]=Math.random()*6.28;}
 const gGeo=new THREE.BufferGeometry();
 gGeo.setAttribute('position',new THREE.BufferAttribute(gp,3));
 gGeo.setAttribute('ph',new THREE.BufferAttribute(gph,1));
 const glowUni={uT:{value:0},uO:{value:0}};
-scene.add(new THREE.Points(gGeo,new THREE.ShaderMaterial({uniforms:glowUni,transparent:true,
-  depthWrite:false,blending:THREE.AdditiveBlending,
+scene.add(new THREE.Points(gGeo,new THREE.ShaderMaterial({uniforms:glowUni,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
   vertexShader:`attribute float ph;uniform float uT;varying float vA;
-    void main(){vA=.5+.5*sin(uT*1.6+ph+position.y*.08);
+    void main(){vA=.5+.5*sin(uT*1.5+ph+position.y*.07);
     vec4 mv=modelViewMatrix*vec4(position,1.);
-    gl_PointSize=(3.+vA*7.)*(60./-mv.z);gl_Position=projectionMatrix*mv;}`,
+    gl_PointSize=(3.+vA*8.)*(60./-mv.z);gl_Position=projectionMatrix*mv;}`,
   fragmentShader:`varying float vA;uniform float uO;
     void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
-    float a=(1.-d*2.)*vA*uO;gl_FragColor=vec4(.49,.94,.77,a);}`})));
+    float a=pow(1.-d*2.,1.6)*vA*uO;gl_FragColor=vec4(.49,.94,.77,a);}`})));
 
-// ---------- dno
-const fg=new THREE.PlaneGeometry(220,220,90,90),fp=fg.attributes.position;
+// ------- Żabnica (lampka w ciemności)
+const lure=new THREE.PointLight(0xA8FFE0,0,26);lure.position.set(-10,-238,-14);scene.add(lure);
+const lureDot=new THREE.Mesh(new THREE.SphereGeometry(.16,10,10),
+  new THREE.MeshBasicMaterial({color:0xD5FFF0}));lureDot.position.copy(lure.position);scene.add(lureDot);
+const angler=new THREE.Mesh(new THREE.SphereGeometry(1.5,14,10),
+  new THREE.MeshStandardMaterial({color:0x05090D,roughness:1}));
+angler.scale.set(1.7,1,1);angler.position.set(-11.6,-238.8,-14.6);scene.add(angler);
+
+// ------- dno + komin hydrotermalny
+const fg=new THREE.PlaneGeometry(240,240,100,100),fp=fg.attributes.position;
 for(let i=0;i<fp.count;i++){const x=fp.getX(i),y=fp.getY(i);
-  fp.setZ(i,Math.sin(x*.22)*Math.cos(y*.19)*1.8+Math.random()*.7);}
+  fp.setZ(i,Math.sin(x*.2)*Math.cos(y*.17)*2+Math.sin(x*.53)*Math.sin(y*.61)*.8+Math.random()*.5);}
 fg.computeVertexNormals();
-const floor=new THREE.Mesh(fg,new THREE.MeshStandardMaterial({color:0x0C1B26,roughness:1}));
-floor.rotation.x=-Math.PI/2;floor.position.y=-305;scene.add(floor);
-const floorL=new THREE.PointLight(0x7CF0C4,0,55);floorL.position.set(0,-296,0);scene.add(floorL);
+const floor=new THREE.Mesh(fg,new THREE.MeshStandardMaterial({color:0x0D1D28,roughness:1}));
+floor.rotation.x=-Math.PI/2;floor.position.y=-308;scene.add(floor);
+const floorL=new THREE.PointLight(0x7CF0C4,0,60);floorL.position.set(0,-298,0);scene.add(floorL);
+// komin
+const vent=new THREE.Mesh(new THREE.CylinderGeometry(.6,1.8,7,9),new THREE.MeshStandardMaterial({color:0x141B20,roughness:1}));
+vent.position.set(6,-304.5,-16);scene.add(vent);
+const ventL=new THREE.PointLight(0xFF7A33,0,16);ventL.position.set(6,-300,-16);scene.add(ventL);
+const NV=MOBILE?100:200,vp=new Float32Array(NV*3),vv=new Float32Array(NV);
+for(let i=0;i<NV;i++){vp[i*3]=6+(Math.random()-.5)*.8;vp[i*3+1]=-301+Math.random()*14;vp[i*3+2]=-16+(Math.random()-.5)*.8;vv[i]=.4+Math.random()*.9;}
+const vGeo=new THREE.BufferGeometry();vGeo.setAttribute('position',new THREE.BufferAttribute(vp,3));
+const smoke=new THREE.Points(vGeo,new THREE.PointsMaterial({color:0x2A3238,size:.8,transparent:true,opacity:.5,depthWrite:false}));
+scene.add(smoke);
 
-// ---------- KEYFRAMES kamery (scroll = oś czasu filmu)
+// ------- kamera: gładka ścieżka Catmull-Rom przez keyframe'y
 const K=[
-  {t:0.00,p:[0,-5,16], l:[0,6,0],   f:74},
-  {t:0.10,p:[0,-16,13],l:[0,-8,0],  f:68},
-  {t:0.20,p:[8,-52,12],l:[-2,-66,-8],f:62},
-  {t:0.32,p:[-7,-88,11],l:[3,-98,-10],f:60},
-  {t:0.44,p:[0,-135,9],l:[0,-142,-24],f:44},   // dolly-in w ciemność
-  {t:0.55,p:[0,-172,18],l:[-14,-184,-40],f:72}, // szeroki kadr na kaszalota
-  {t:0.68,p:[5,-210,12],l:[0,-222,-12],f:62},
-  {t:0.82,p:[-3,-262,11],l:[0,-272,-10],f:58},
-  {t:1.00,p:[0,-297,7], l:[0,-304,-16],f:52},
+  {t:0.00,p:[0,-5,16], l:[0,7,0],   f:74},
+  {t:0.09,p:[1,-16,13],l:[0,-8,0],  f:69},
+  {t:0.19,p:[8,-52,13],l:[-2,-66,-8],f:63},
+  {t:0.30,p:[-7,-88,11],l:[3,-98,-10],f:60},
+  {t:0.42,p:[0,-135,9],l:[0,-142,-24],f:44},
+  {t:0.54,p:[0,-172,19],l:[-14,-184,-40],f:73},
+  {t:0.66,p:[5,-210,12],l:[0,-222,-12],f:63},
+  {t:0.80,p:[-3,-262,11],l:[-8,-240,-12],f:60},
+  {t:0.90,p:[2,-288,12],l:[4,-300,-14],f:56},
+  {t:1.00,p:[0,-299,7], l:[3,-305,-15],f:52},
 ];
-const sm=t=>t*t*(3-2*t);
+const posCurve=new THREE.CatmullRomCurve3(K.map(k=>new THREE.Vector3(...k.p)),false,'centripetal',.5);
+const lookCurve=new THREE.CatmullRomCurve3(K.map(k=>new THREE.Vector3(...k.l)),false,'centripetal',.5);
+const _p=new THREE.Vector3(),_l=new THREE.Vector3();
 function cam(t){
   let i=0;while(i<K.length-2&&t>K[i+1].t)i++;
-  const a=K[i],b=K[i+1],u=sm(Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t))));
-  camera.position.set(a.p[0]+(b.p[0]-a.p[0])*u,a.p[1]+(b.p[1]-a.p[1])*u,a.p[2]+(b.p[2]-a.p[2])*u);
-  camera.lookAt(a.l[0]+(b.l[0]-a.l[0])*u,a.l[1]+(b.l[1]-a.l[1])*u,a.l[2]+(b.l[2]-a.l[2])*u);
-  camera.fov=a.f+(b.f-a.f)*u;camera.updateProjectionMatrix();
+  const a=K[i],b=K[i+1];
+  const lu=Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t)));
+  const u=(i+lu)/(K.length-1);
+  posCurve.getPoint(u,_p);lookCurve.getPoint(u,_l);
+  camera.position.copy(_p);camera.lookAt(_l);
+  const su=lu*lu*(3-2*lu);
+  camera.fov=a.f+(b.f-a.f)*su;camera.updateProjectionMatrix();
 }
 
-// ---------- scroll / HUD / napisy / letterbox
-const MAXD=10900;let target=0,cur=0;
+// ------- scroll / UI
+const MAXD=10900;let target=0,cur=0,shownD=0;
 const caps=[...document.querySelectorAll('.cap')].map(el=>({el,a:+el.dataset.in,b:+el.dataset.out}));
-const mEl=m.valueOf?document.getElementById('m'):null;
 const $=id=>document.getElementById(id);
 const zones=[[0,'POWIERZCHNIA'],[200,'STREFA ZMIERZCHU'],[1000,'STREFA PÓŁNOCY'],[4000,'OTCHŁAŃ'],[6000,'STREFA HADALNA']];
 function frac(){const h=document.documentElement;return Math.min(1,h.scrollTop/(h.scrollHeight-h.clientHeight));}
-addEventListener('scroll',()=>{target=frac();$('hint').style.opacity=target>.015?0:1;},{passive:true});
+addEventListener('scroll',()=>{target=frac();$('hint').style.opacity=target>.012?0:1;},{passive:true});
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
-
-// ziarno filmowe
 const gcx=$('gc').getContext('2d');let gf=0;
 function grain(){if(reduced)return;if(++gf%3)return;
   const d=gcx.createImageData(140,140);
   for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255|0;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}
   gcx.putImageData(d,0,0);}
+const ss=t=>t*t*(3-2*t);
 
 let t0=0;
 function tick(time){
   requestAnimationFrame(tick);
   const dt=Math.min(50,time-t0);t0=time;const T=time*.001;
-  cur+=(target-cur)*(reduced?1:.07);
+  cur+=(target-cur)*(reduced?1:Math.min(1,.0035*dt+.02));
   cam(cur);
-  camera.position.x+=Math.sin(T*.5)*.15;      // dryf prądu
-  camera.position.y+=Math.sin(T*.8)*.08;
+  if(!reduced){
+    camera.position.x+=Math.sin(T*.5)*.16;
+    camera.position.y+=Math.sin(T*.83)*.09;
+    camera.rotation.z+=Math.sin(T*.31)*.004; // kołysanie kadłuba
+  }
 
-  // grading
+  // grading + atmosfera
   const col=grade(cur);
   scene.fog.color.copy(col);renderer.setClearColor(col);
-  scene.fog.density=.028+cur*.012;
-  amb.intensity=Math.max(.1,1-cur*1.5);
-  sun.intensity=Math.max(0,1.4-cur*4);
-  rayMat.uniforms.uO.value=Math.max(0,1-cur*5.5);
-  water.visible=cur<.2;rays.visible=cur<.22;
-  glowUni.uO.value=Math.min(1,Math.max(0,(cur-.42)*2.5));
-  floorL.intensity=Math.max(0,(cur-.82))*20;
+  scene.fog.density=.026+cur*.013;
+  amb.intensity=Math.max(.07,1-cur*1.6);
+  hemi.intensity=Math.max(0,.5-cur*1.2);
+  sun.intensity=Math.max(0,1.5-cur*4.5);
+  renderer.toneMappingExposure=1.15-cur*.25;
+  rayMat.uniforms.uO.value=Math.max(0,1-cur*5.5);rayMat.uniforms.uT.value=T;
+  caustUni.uO.value=Math.max(0,1-cur*6);caustUni.uT.value=T;
+  water.visible=cur<.2;rays.visible=cur<.22;caust.visible=cur<.2;
+  glowUni.uO.value=ss(Math.min(1,Math.max(0,(cur-.40)/.35)));
+  floorL.intensity=ss(Math.max(0,(cur-.82)/.18))*22;
+
+  // reflektor: włącza się "od tego miejsca światło nie istnieje"
+  const head=ss(Math.min(1,Math.max(0,(cur-.44)/.08)));
+  spot.intensity=head*2.6;coneMat.uniforms.uO.value=head;
+  dustMat.opacity=head*.5;
 
   // shadery czasowe
   waterUni.uT.value=T;jellyUni.uT.value=T;glowUni.uT.value=T;
 
-  // meduzy: dryf + falowanie macek
+  // bąble w górę
+  if(!reduced&&cur<.16){const p=bGeo.attributes.position;
+    for(let i=0;i<NB;i++){let y=p.getY(i)+ (.002+.001*(i%3))*dt;
+      if(y>6)y=-30;p.setY(i,y);
+      p.setX(i,p.getX(i)+Math.sin(T*2+i)*.004);}
+    p.needsUpdate=true;}
+  bubbles.visible=cur<.18;
+
+  // ławica: krąży, faluje, drży
+  if(fish.visible=cur>.1&&cur<.5){
+    for(let i=0;i<NF;i++){const f=fdat[i],tt=T*f.sp+f.ph;
+      const x=Math.cos(tt)*f.r,z=Math.sin(tt)*f.r*.55,y=f.yo+Math.sin(tt*2.1)*1.6;
+      dummy.position.set(x,y,z);
+      dummy.lookAt(Math.cos(tt+.1)*f.r,f.yo+Math.sin((tt+.1)*2.1)*1.6,Math.sin(tt+.1)*f.r*.55);
+      dummy.rotation.z=Math.sin(tt*7)*.25;
+      dummy.updateMatrix();fish.setMatrixAt(i,dummy.matrix);}
+    fish.instanceMatrix.needsUpdate=true;}
+
+  // meduzy
   for(const j of jellies){
-    if(!reduced){j.position.y=j.userData.baseY+Math.sin(T*.7+j.userData.baseY)*1.2;
-      j.rotation.y+=.0008*dt;}
+    if(!reduced){j.position.y=j.userData.baseY+Math.sin(T*.65+j.userData.baseY)*1.3;
+      j.position.x+=Math.sin(T*.2+j.userData.baseY)*.002;j.rotation.y+=.0007*dt;}
     for(const c of j.children)if(c.isLine){
       const p=c.geometry.attributes.position;
-      for(let k=1;k<p.count;k++)p.setX(k,Math.sin(T*2+c.userData.ph+k*.5)*.06*k);
-      p.needsUpdate=true;}
-  }
+      for(let k=1;k<p.count;k++)p.setX(k,Math.sin(T*2+c.userData.ph+k*.5)*.065*k);
+      p.needsUpdate=true;}}
 
-  // kaszalot: przepływ sterowany WYŁĄCZNIE scrollem (0.50→0.66)
-  const wp=Math.min(1,Math.max(0,(cur-.50)/.16));
-  whale.position.x=-95+wp*190;
-  whale.position.y=-185+Math.sin(wp*Math.PI)*6;
-  whale.rotation.x=Math.sin(wp*Math.PI*2)*.06;
-  fluke.rotation.x=Math.sin(wp*26)*.5;
-  whaleGlow.intensity=Math.sin(wp*Math.PI)*3;
+  // kaszalot: przepływ sterowany scrollem + żywy ogon
+  const wp=Math.min(1,Math.max(0,(cur-.48)/.17));
+  whale.position.x=-100+ss(wp)*200;
+  whale.position.y=-185+Math.sin(wp*Math.PI)*7;
+  whale.rotation.x=Math.sin(wp*Math.PI*2)*.07;
+  whale.rotation.z=Math.sin(T*.4)*.03;
+  fluke.rotation.x=Math.sin(wp*22+T*2)*.45;
+  whaleGlow.intensity=Math.sin(wp*Math.PI)*3.4;
+
+  // żabnica: lampka dryfuje i mruga
+  const anglerOn=ss(Math.min(1,Math.max(0,(cur-.68)/.1)))*(cur<.92?1:0);
+  lure.intensity=anglerOn*(1.6+Math.sin(T*3.7)*.9);
+  lureDot.material.opacity=1;lureDot.visible=anglerOn>.05;angler.visible=anglerOn>.05;
+  lure.position.y=-238+Math.sin(T*.9)*.8;lureDot.position.copy(lure.position);
+  angler.position.set(lure.position.x-1.6,lure.position.y-.8,lure.position.z-.6);
+
+  // komin: dym + żar
+  if(!reduced){const p=vGeo.attributes.position;
+    for(let i=0;i<NV;i++){let y=p.getY(i)+vv[i]*.004*dt;
+      if(y>-286)y=-301;p.setY(i,y);
+      p.setX(i,p.getX(i)+Math.sin(T+i)*.003);}
+    p.needsUpdate=true;}
+  ventL.intensity=ss(Math.max(0,(cur-.85)/.15))*(2+Math.sin(T*5)*.7);
 
   // śnieg
   if(!reduced){const p=sGeo.attributes.position;
-    for(let i=0;i<SNOW;i++){let y=p.getY(i)-.0015*dt;if(y<15-SPAN)y=15;p.setY(i,y);}
+    for(let i=0;i<SNOW;i++){let y=p.getY(i)-.0014*dt;if(y<15-SPAN)y=15;p.setY(i,y);}
     p.needsUpdate=true;}
 
-  // letterbox przy momentach kinowych
-  const lb=Math.max(Math.min(1,(cur-.40)/.05)*Math.min(1,(.68-cur)/.05),
-                    Math.min(1,(cur-.88)/.05));
-  const h=Math.max(0,lb)*7;
-  $('barT').style.height=$('barB').style.height=h+'vh';
+  // letterbox
+  const lb=Math.max(Math.min(1,(cur-.38)/.05)*Math.min(1,(.68-cur)/.05),Math.min(1,(cur-.88)/.05));
+  $('barT').style.height=$('barB').style.height=(Math.max(0,ss(Math.max(0,Math.min(1,lb))))*7)+'vh';
 
   // napisy
   for(const c of caps){
     const w=c.b-c.a,e=Math.min((cur-c.a)/(w*.25),(c.b-cur)/(w*.25));
-    const o=Math.max(0,Math.min(1,e));
+    const o=ss(Math.max(0,Math.min(1,e)));
     c.el.style.opacity=o;
     const base=c.el.classList.contains('center')?'translate(-50%,':'translate(0,';
-    c.el.style.transform=base+(-40+(1-o)*4)+'%)';
-  }
+    c.el.style.transform=base+(-40+(1-o)*3.5)+'%)';}
 
-  // HUD
-  const d=Math.round(cur*MAXD);
+  // HUD z płynnym licznikiem
+  shownD+=((cur*MAXD)-shownD)*.12;
+  const d=Math.round(shownD);
   $('m').textContent=d.toLocaleString('pl-PL');
   $('atm').textContent=Math.round(1+d/10).toLocaleString('pl-PL');
   $('temp').textContent=Math.max(1,Math.round(22-Math.min(d,1000)/1000*18-Math.min(Math.max(d-1000,0),9900)/9900*3));
   let zn=zones[0][1];for(const[dep,n]of zones)if(d>=dep)zn=n;$('zone').textContent=zn;
+  const secs=Math.round(cur*5400),mm=String(Math.floor(secs/60)).padStart(2,'0'),sc=String(secs%60).padStart(2,'0');
+  $('tc').textContent=mm+':'+sc;
 
   grain();
   renderer.render(scene,camera);
