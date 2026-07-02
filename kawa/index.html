@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PALARNIA·9 — kawa sterowana scrollem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F3E7D6;--copper:#C97B3D;--ink:#1B0F08}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#160D07;color:var(--cream);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+#spacer{height:1300vh}
+#scene{position:fixed;inset:0;z-index:0}
+#vignette{position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(10,4,1,.65) 100%)}
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;
+  justify-content:space-between;padding:20px 5vw;mix-blend-mode:normal}
+.logo{font-family:'Fraunces',serif;font-weight:900;font-size:20px;letter-spacing:.04em}
+.logo span{color:var(--copper)}
+.menu{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;opacity:.75}
+.menu b{margin-left:22px;font-weight:400;cursor:pointer}
+/* hud */
+.hud{position:fixed;bottom:24px;right:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
+  text-align:right;font-size:11px;line-height:1.8;color:var(--copper)}
+.hud .big{font-size:24px;font-weight:600;color:var(--cream)}
+.cap{position:fixed;z-index:8;left:7vw;top:50%;transform:translateY(-42%);
+  max-width:560px;opacity:0;pointer-events:none;will-change:opacity,transform}
+.cap.right{left:auto;right:7vw;text-align:right}
+.cap.center{left:50%;text-align:center;transform:translate(-50%,-42%)}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.28em;color:var(--copper);margin-bottom:14px}
+h1,h2{font-family:'Fraunces',serif;font-weight:900;line-height:1.02}
+h1{font-size:clamp(52px,10vw,124px);letter-spacing:-.01em}
+h2{font-size:clamp(30px,5.4vw,60px);margin-bottom:14px}
+p{font-size:16px;line-height:1.7;color:rgba(243,231,214,.82);max-width:42ch}
+.cap.right p{margin-left:auto}.cap.center p{margin:0 auto}
+.cta{display:inline-block;margin-top:22px;padding:14px 34px;border:1px solid var(--copper);
+  color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;
+  text-decoration:none;background:rgba(201,123,61,.12)}
+.scrollhint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(243,231,214,.55);transition:opacity .4s}
+.credit{position:fixed;bottom:24px;left:24px;z-index:10;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:.14em;color:rgba(243,231,214,.4)}
+.credit a{color:var(--copper);text-decoration:none}
+@media(max-width:640px){.menu{display:none}.cap{left:7vw;max-width:86vw}p{font-size:14.5px}
+  .cap.right{right:7vw}}
+</style>
+</head>
+<body>
+<div id="spacer"></div>
+<canvas id="scene"></canvas>
+<div id="vignette"></div>
+
+<nav><div class="logo">PALARNIA<span>·9</span></div>
+<div class="menu"><b>ZIARNA</b><b>PALENIE</b><b>SUBSKRYPCJA</b><b>KONTAKT</b></div></nav>
+
+<div class="hud"><div class="big"><span id="deg">92</span>°C</div>
+<div><span id="ml">0</span> ML MLEKA · <span id="st">ESPRESSO</span></div></div>
+<div class="scrollhint" id="hint">SCROLL = PARZENIE ▼</div>
+<div class="credit">DEMO PROCEDURALNE · ZERO ZDJĘĆ · NAPISANE PRZEZ CLAUDE · <a href="https://ogarniamy.ai">ogarniamy.ai</a></div>
+
+<div class="cap center" data-in="0" data-out=".08">
+  <div class="eyebrow">ŚWIEŻO PALONA · MAŁE PARTIE</div>
+  <h1>Poczuj,<br>zanim klikniesz.</h1>
+</div>
+<div class="cap" data-in=".11" data-out=".22">
+  <div class="eyebrow">01 · ZIARNO</div>
+  <h2>Etiopia, 1900 m n.p.m.</h2>
+  <p>Każde ziarno wokół twojego kubka przeleciało przez ręce trzech osób, zanim trafiło do pieca. Jagoda, bergamotka, miód.</p>
+</div>
+<div class="cap right" data-in=".28" data-out=".40">
+  <div class="eyebrow">02 · CREMA</div>
+  <h2>92 stopnie prawdy</h2>
+  <p>Espresso nie wybacza. Dwadzieścia pięć sekund ekstrakcji decyduje o wszystkim — patrz, jak para unosi aromat.</p>
+</div>
+<div class="cap" data-in=".46" data-out=".60">
+  <div class="eyebrow">03 · MLEKO</div>
+  <h2>Aksamit wlewa się scrollem</h2>
+  <p>Przewijasz — mleko płynie. Zatrzymasz — strumień zawiśnie w powietrzu. Mikropianka na 65 stopni, ani kropli więcej.</p>
+</div>
+<div class="cap right" data-in=".66" data-out=".78">
+  <div class="eyebrow">04 · SPLASH</div>
+  <h2>Kostka. Rozbryzg.</h2>
+  <p>Jedna kostka trzcinowego cukru. Cały rozbryzg należy do ciebie — cofnij scroll, a krople wrócą do kubka.</p>
+</div>
+<div class="cap center" data-in=".88" data-out="1">
+  <div class="eyebrow">PALARNIA·9</div>
+  <h2>Twoja kawa czeka.</h2>
+  <p>250 g · świeżo palona · wysyłka w 24 h</p>
+  <a class="cta" href="#">ZAMÓW ZIARNA →</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOBILE=Math.min(innerWidth,innerHeight)<620;
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('scene'),antialias:!MOBILE});
+renderer.setPixelRatio(Math.min(devicePixelRatio,MOBILE?1.6:2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+renderer.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x160D07,.045);
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,100);
+scene.add(camera);
+
+// światło kawiarni
+scene.add(new THREE.AmbientLight(0xFFE2C4,.45));
+const key=new THREE.SpotLight(0xFFD9A8,2.2,30,.7,.6);key.position.set(4,7,3);scene.add(key);
+const rim=new THREE.DirectionalLight(0xFF9E5E,.9);rim.position.set(-5,3,-4);scene.add(rim);
+const fill=new THREE.PointLight(0xFFC894,.5,15);fill.position.set(-2,2,4);scene.add(fill);
+
+// bokeh świateł kawiarni w tle
+const NBK=MOBILE?14:24,bkG=new THREE.BufferGeometry(),bkp=new Float32Array(NBK*3);
+for(let i=0;i<NBK;i++){bkp[i*3]=(Math.random()-.5)*40;bkp[i*3+1]=1+Math.random()*8;bkp[i*3+2]=-10-Math.random()*20;}
+bkG.setAttribute('position',new THREE.BufferAttribute(bkp,3));
+scene.add(new THREE.Points(bkG,new THREE.PointsMaterial({color:0xFFB061,size:2.6,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+// blat: proceduralne drewno (shader)
+const wood=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.ShaderMaterial({
+  uniforms:{},
+  vertexShader:`varying vec2 vUv;varying vec3 vP;void main(){vUv=uv;vP=position;
+    gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec2 vUv;varying vec3 vP;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+      return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    void main(){
+      float grain=n(vec2(vUv.x*160.,vUv.y*7.))*.5+n(vec2(vUv.x*400.,vUv.y*18.))*.25;
+      float ring=sin(vUv.y*90.+grain*6.)*.5+.5;
+      vec3 c=mix(vec3(.16,.09,.05),vec3(.29,.17,.09),ring*.5+grain*.5);
+      float d=distance(vUv,vec2(.5));c*=smoothstep(.75,.2,d)*1.25;
+      gl_FragColor=vec4(c,1.);}`
+}));
+wood.rotation.x=-Math.PI/2;scene.add(wood);
+
+// ---------- KUBEK (szklany, lathe) + kawa
+const cupPts=[];
+for(let i=0;i<=20;i++){const t=i/20;
+  cupPts.push(new THREE.Vector2(.72+Math.sin(t*Math.PI*.5)*.33,t*1.5));}
+const glassMat=new THREE.MeshPhysicalMaterial({color:0xFFFFFF,roughness:.06,metalness:0,
+  transparent:true,opacity:.16,side:THREE.DoubleSide,depthWrite:false});
+const cup=new THREE.Mesh(new THREE.LatheGeometry(cupPts,48),glassMat);scene.add(cup);
+const handle=new THREE.Mesh(new THREE.TorusGeometry(.42,.075,14,40,Math.PI*1.25),glassMat);
+handle.position.set(1.06,.8,0);handle.rotation.z=-.35;scene.add(handle);
+// spodek
+const saucer=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.2,.09,48),
+  new THREE.MeshStandardMaterial({color:0xEFE3D0,roughness:.35}));
+saucer.position.y=.045;scene.add(saucer);
+
+// słup kawy w środku (kolor miesza się z mlekiem)
+const coffeeUni={uT:{value:0},uMix:{value:0},uRip:{value:0}};
+const coffee=new THREE.Mesh(new THREE.CylinderGeometry(.86,.72,1.14,48),new THREE.ShaderMaterial({
+  uniforms:coffeeUni,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec2 vUv;uniform float uMix;
+    void main(){vec3 esp=vec3(.13,.06,.03),lat=vec3(.72,.5,.33);
+    vec3 c=mix(esp,lat,uMix*smoothstep(0.,1.,vUv.y));
+    gl_FragColor=vec4(c,1.);}`}));
+coffee.position.y=.62;scene.add(coffee);
+
+// powierzchnia kawy: wiry, fale, crema
+const surf=new THREE.Mesh(new THREE.CircleGeometry(.86,64),new THREE.ShaderMaterial({
+  uniforms:coffeeUni,
+  vertexShader:`varying vec2 vUv;uniform float uT;uniform float uRip;
+    void main(){vec3 p=position;vec2 c=uv-.5;float d=length(c);
+    p.z+=sin(d*30.-uT*4.)*.02*uRip*(1.-d*2.);
+    vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+  fragmentShader:`varying vec2 vUv;uniform float uT;uniform float uMix;uniform float uRip;
+    void main(){vec2 c=vUv-.5;float d=length(c),a=atan(c.y,c.x);
+    float swirl=sin(a*3.+d*14.-uT*.9)*.5+.5;
+    vec3 esp=vec3(.16,.08,.04),crema=vec3(.55,.36,.2),milk=vec3(.86,.72,.55);
+    vec3 base=mix(esp,crema,swirl*.55+.2);
+    float rosetta=smoothstep(.25,.0,abs(sin(a*2.+d*20.))*d)*uMix;
+    vec3 col=mix(base,milk,uMix*.75+rosetta*.5);
+    float ring=smoothstep(.5,.46,d)-smoothstep(.46,.40,d);
+    col+=vec3(.2,.13,.07)*ring;
+    float rip=sin(d*40.-uT*5.)*.5*uRip*(1.-d*2.);col+=rip*.12;
+    gl_FragColor=vec4(col,1.);}`}));
+surf.rotation.x=-Math.PI/2;surf.position.y=1.2;scene.add(surf);
+
+// ---------- PARA (shader points)
+const NS=MOBILE?160:300,stp=new Float32Array(NS*3),sph=new Float32Array(NS);
+for(let i=0;i<NS;i++){stp[i*3]=(Math.random()-.5)*.5;stp[i*3+1]=Math.random()*2.4;stp[i*3+2]=(Math.random()-.5)*.5;sph[i]=Math.random()*6.28;}
+const stG=new THREE.BufferGeometry();
+stG.setAttribute('position',new THREE.BufferAttribute(stp,3));
+stG.setAttribute('ph',new THREE.BufferAttribute(sph,1));
+const steamUni={uT:{value:0},uO:{value:1}};
+const steam=new THREE.Points(stG,new THREE.ShaderMaterial({uniforms:steamUni,transparent:true,depthWrite:false,
+  vertexShader:`attribute float ph;uniform float uT;varying float vA;
+    void main(){vec3 p=position;
+    float life=fract(p.y/2.4+uT*.14+ph*.1);
+    p.y=life*2.4;
+    p.x+=sin(uT*1.2+ph+life*5.)* (.12+life*.35);
+    p.z+=cos(uT*.9+ph+life*4.)* (.1+life*.3);
+    vA=sin(life*3.14159);
+    vec4 mv=modelViewMatrix*vec4(p,1.);
+    gl_PointSize=(8.+life*26.)*(3./-mv.z);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying float vA;uniform float uO;
+    void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;
+    gl_FragColor=vec4(.95,.92,.88,pow(1.-d*2.,2.)*.10*vA*uO);}`}));
+steam.position.y=1.25;scene.add(steam);
+
+// ---------- ZIARNA (instanced, orbitują — parallax scrolla)
+const NZ=MOBILE?26:44;
+const beanGeo=new THREE.SphereGeometry(.16,12,10);beanGeo.scale(1,.68,.52);
+const beans=new THREE.InstancedMesh(beanGeo,
+  new THREE.MeshStandardMaterial({color:0x3A2010,roughness:.55,metalness:.05}),NZ);
+const bd=[];for(let i=0;i<NZ;i++)bd.push({r:1.9+Math.random()*3.4,h:.5+Math.random()*3.2,
+  ph:Math.random()*6.28,sp:.12+Math.random()*.2,rx:Math.random()*6,ry:Math.random()*6,s:.7+Math.random()*.9});
+scene.add(beans);const dummy=new THREE.Object3D();
+
+// ---------- STRUMIEŃ MLEKA (scrubbed) + dzbanek
+const milkUni={uT:{value:0},uL:{value:0}};
+const milk=new THREE.Mesh(new THREE.CylinderGeometry(.05,.075,1,12,20,true),new THREE.ShaderMaterial({
+  uniforms:milkUni,transparent:true,side:THREE.DoubleSide,
+  vertexShader:`uniform float uT;uniform float uL;varying float vY;
+    void main(){vec3 p=position;vY=uv.y;
+    p.x+=sin(uT*7.+uv.y*14.)*.02*uv.y;
+    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+  fragmentShader:`varying float vY;uniform float uL;
+    void main(){if(vY>uL)discard;
+    gl_FragColor=vec4(.96,.93,.87,.95);}`}));
+milk.position.set(-.25,1.2+.9,0);scene.add(milk); // od góry do powierzchni
+const jug=new THREE.Mesh(new THREE.CylinderGeometry(.28,.36,.5,20,1,true),
+  new THREE.MeshStandardMaterial({color:0xC8CDD2,roughness:.25,metalness:.9,side:THREE.DoubleSide}));
+jug.position.set(-.55,2.35,0);jug.rotation.z=.9;scene.add(jug);
+// kropelki przy uderzeniu mleka
+const NM=MOBILE?40:80,mp=new Float32Array(NM*3),mph=new Float32Array(NM);
+for(let i=0;i<NM;i++){mph[i]=Math.random()*6.28;mp[i*3+1]=1.22;}
+const mG=new THREE.BufferGeometry();mG.setAttribute('position',new THREE.BufferAttribute(mp,3));
+const milkDrops=new THREE.Points(mG,new THREE.PointsMaterial({color:0xF6F1E8,size:.05,transparent:true,opacity:0,depthWrite:false}));
+scene.add(milkDrops);
+
+// ---------- KOSTKA CUKRU + ROZBRYZG (w pełni scrubbed)
+const cube=new THREE.Mesh(new THREE.BoxGeometry(.22,.22,.22),
+  new THREE.MeshStandardMaterial({color:0xEFE6D2,roughness:.9}));
+scene.add(cube);
+const NSP=MOBILE?70:130,spl=[],sG2=new THREE.BufferGeometry();
+const sp3=new Float32Array(NSP*3);
+for(let i=0;i<NSP;i++){const a=Math.random()*6.28,v=.6+Math.random()*1.6;
+  spl.push({a,v,vy:1.4+Math.random()*2.2});}
+sG2.setAttribute('position',new THREE.BufferAttribute(sp3,3));
+const splash=new THREE.Points(sG2,new THREE.PointsMaterial({color:0xB98A5C,size:.06,transparent:true,opacity:0,depthWrite:false}));
+scene.add(splash);
+
+// ---------- kamera: Catmull-Rom wokół kubka
+const K=[
+  {t:0.00,p:[0,1.6,6.4], l:[0,1.1,0], f:46},
+  {t:0.11,p:[3.6,2.2,4.6],l:[0,1.0,0], f:44},
+  {t:0.24,p:[4.6,1.1,1.6],l:[0,1.2,0], f:40},   // nisko przy ziarnach
+  {t:0.36,p:[2.2,3.4,3.2],l:[0,1.2,0], f:38},
+  {t:0.50,p:[-2.6,2.6,3.8],l:[-.2,1.5,0],f:42}, // widok na wlew mleka
+  {t:0.62,p:[-3.8,1.4,2.0],l:[0,1.2,0], f:40},
+  {t:0.74,p:[1.8,2.8,-3.4],l:[0,1.2,0], f:44},  // zza kubka na splash
+  {t:0.86,p:[.4,4.6,1.6], l:[0,1.2,0], f:38},   // prawie top-down: rozeta
+  {t:1.00,p:[0,2.2,5.6],  l:[0,1.1,0], f:46},
+];
+const posC=new THREE.CatmullRomCurve3(K.map(k=>new THREE.Vector3(...k.p)),false,'centripetal',.5);
+const lookC=new THREE.CatmullRomCurve3(K.map(k=>new THREE.Vector3(...k.l)),false,'centripetal',.5);
+const _p=new THREE.Vector3(),_l=new THREE.Vector3();
+function cam(t){let i=0;while(i<K.length-2&&t>K[i+1].t)i++;
+  const a=K[i],b=K[i+1],lu=Math.min(1,Math.max(0,(t-a.t)/(b.t-a.t)));
+  const u=(i+lu)/(K.length-1);
+  posC.getPoint(u,_p);lookC.getPoint(u,_l);
+  camera.position.copy(_p);camera.lookAt(_l);
+  const su=lu*lu*(3-2*lu);camera.fov=a.f+(b.f-a.f)*su;camera.updateProjectionMatrix();}
+
+// ---------- scroll / UI
+let target=0,cur=0,ripKick=0;
+const $=id=>document.getElementById(id);
+const caps=[...document.querySelectorAll('.cap')].map(el=>({el,a:+el.dataset.in,b:+el.dataset.out}));
+function frac(){const h=document.documentElement;return Math.min(1,h.scrollTop/(h.scrollHeight-h.clientHeight));}
+addEventListener('scroll',()=>{target=frac();$('hint').style.opacity=target>.012?0:1;},{passive:true});
+function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);resize();
+const ss=t=>t*t*(3-2*t);
+const seg=(t,a,b)=>ss(Math.min(1,Math.max(0,(t-a)/(b-a))));
+
+let t0=0;
+function tick(time){
+  requestAnimationFrame(tick);
+  const dt=Math.min(50,time-t0);t0=time;const T=time*.001;
+  cur+=(target-cur)*(reduced?1:Math.min(1,.0035*dt+.02));
+  cam(cur);
+  if(!reduced){camera.position.x+=Math.sin(T*.4)*.05;camera.position.y+=Math.sin(T*.6)*.03;}
+
+  coffeeUni.uT.value=T;steamUni.uT.value=T;milkUni.uT.value=T;
+
+  // 03: mleko — wlew sterowany scrollem (0.46→0.62)
+  const pour=seg(cur,.46,.62);
+  milkUni.uL.value=pour>0?Math.min(1,pour*1.3):0;
+  milk.visible=pour>0&&pour<1;jug.visible=pour>0&&pour<.98;
+  jug.position.y=2.35+(1-Math.min(1,pour*4))*1.5; // dzbanek wjeżdża
+  coffeeUni.uMix.value=pour;
+  milkDrops.material.opacity=pour>0&&pour<1?.9:0;
+  if(pour>0&&pour<1){const p=mG.attributes.position;
+    for(let i=0;i<NM;i++){const ph=mph[i],r=.06+fract1(ph+T*1.5)*.3;
+      p.setX(i,-.25+Math.cos(ph*7.3)*r);p.setZ(i,Math.sin(ph*5.1)*r);
+      p.setY(i,1.22+Math.sin(fract1(ph+T*1.5)*3.14)*.16);}
+    p.needsUpdate=true;}
+  function fract1(x){return x-Math.floor(x);}
+
+  // 04: kostka + splash (0.66→0.80) — całkowicie scrubbed
+  const drop=seg(cur,.66,.72),burst=seg(cur,.72,.82);
+  cube.visible=drop>0&&burst<.6;
+  cube.position.set(.15,3.4-drop*2.2,0);
+  cube.rotation.x=drop*7;cube.rotation.z=drop*4;
+  cube.scale.setScalar(1-burst*.9);
+  splash.material.opacity=burst>0&&burst<1?(1-burst)*.95:0;
+  if(burst>0){const p=sG2.attributes.position;
+    for(let i=0;i<NSP;i++){const s=spl[i],tt=burst;
+      p.setX(i,.15+Math.cos(s.a)*s.v*tt);
+      p.setZ(i,Math.sin(s.a)*s.v*tt);
+      p.setY(i,1.22+s.vy*tt-4.5*tt*tt);}
+    p.needsUpdate=true;}
+  coffeeUni.uRip.value=Math.max(burst>0&&burst<1?Math.sin(burst*Math.PI):0,pour>0&&pour<1?.5:0);
+
+  // para: mocna na początku, słabnie po mleku
+  steamUni.uO.value=1-pour*.55-seg(cur,.85,1)*.45;
+
+  // ziarna: orbita + reakcja na scroll (przy 01 zlatują się blisko)
+  const gather=seg(cur,.08,.2)*(1-seg(cur,.24,.34));
+  for(let i=0;i<NZ;i++){const b=bd[i];
+    const r=b.r*(1-gather*.45),tt=T*b.sp+b.ph+cur*2.5;
+    dummy.position.set(Math.cos(tt)*r,b.h+Math.sin(tt*1.7)*.3,Math.sin(tt)*r*.8);
+    dummy.rotation.set(b.rx+T*.4,b.ry+T*.3,0);
+    dummy.scale.setScalar(b.s);
+    dummy.updateMatrix();beans.setMatrixAt(i,dummy.matrix);}
+  beans.instanceMatrix.needsUpdate=true;
+
+  // napisy
+  for(const c of caps){const w=c.b-c.a,e=Math.min((cur-c.a)/(w*.25),(c.b-cur)/(w*.25));
+    const o=ss(Math.max(0,Math.min(1,e)));c.el.style.opacity=o;
+    const base=c.el.classList.contains('center')?'translate(-50%,':'translate(0,';
+    c.el.style.transform=base+(-42+(1-o)*3)+'%)';
+    if(c.b>=1)c.el.style.pointerEvents=o>.5?'auto':'none';}
+
+  // HUD
+  $('deg').textContent=Math.round(92-cur*27);
+  $('ml').textContent=Math.round(pour*150);
+  $('st').textContent=cur<.44?'ESPRESSO':cur<.64?'FLAT WHITE':cur<.86?'SŁODZONA':'GOTOWA';
+
+  renderer.render(scene,camera);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
